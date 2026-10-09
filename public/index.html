@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8ccaff">
+  <title>NutriAI — Trợ lý dinh dưỡng thông minh</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="brand">
+          <div class="brand-mark">N</div>
+          <div>
+            <strong>NutriAI</strong>
+            <span>SMART NUTRITION ASSISTANT</span>
+          </div>
+        </div>
+
+        <button id="newChat" class="new-chat">
+          <span class="new-chat-icon">＋</span>
+          <span>Cuộc trò chuyện mới</span>
+        </button>
+
+        <div class="sidebar-search">
+          <span>⌕</span>
+          <input id="chatSearch" type="text" placeholder="Tìm kiếm cuộc trò chuyện..." aria-label="Tìm kiếm cuộc trò chuyện">
+          <kbd>Ctrl K</kbd>
+        </div>
+
+        <div class="nav-section history-section">
+          <div class="nav-label history-heading">
+            <span>CUỘC TRÒ CHUYỆN</span>
+            <button id="clearHistory" class="tiny-action" title="Xóa lịch sử trên máy">×</button>
+          </div>
+          <div id="chatHistory" class="chat-history">
+            <div class="history-empty">Chưa có cuộc trò chuyện nào</div>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">KHÁM PHÁ</div>
+          <button class="nav-item active" id="chatNav">
+            <span class="nav-icon">⌁</span><span>Trợ lý AI</span>
+          </button>
+          <button class="nav-item" id="profileNav">
+            <span class="nav-icon">◎</span><span>Hồ sơ sức khỏe</span>
+          </button>
+          <button class="nav-item" id="knowledgeNav">
+            <span class="nav-icon">▤</span><span>Kho kiến thức</span>
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">TIỆN ÍCH</div>
+          <button class="nav-item" id="clearChatNav">
+            <span class="nav-icon">↺</span><span>Làm mới khung chat</span>
+          </button>
+          <button class="nav-item" id="focusChatNav">
+            <span class="nav-icon">✎</span><span>Viết câu hỏi</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="status-card">
+          <div class="status-row"><span class="status-dot"></span><span id="dbStatus">Database local</span></div>
+          <div class="status-row"><span class="status-dot blue"></span><span id="ragStatus">RAG · TXT đang tải</span></div>
+        </div>
+
+        <div class="mini-note">
+          <div class="mini-note-icon">✦</div>
+          <div>
+            <b>Demo sẵn sàng mở rộng</b>
+            <small>Frontend → API → RAG → Supabase</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="title-block">
+          <div class="eyebrow">AI HEALTH EXPERIENCE</div>
+          <h1>Trợ lý dinh dưỡng</h1>
+          <p>Hỏi về dinh dưỡng, cân nặng, bữa ăn và các chỉ số cơ bản.</p>
+        </div>
+        <div class="top-actions">
+          <div class="rag-pill"><span></span> RAG đang hoạt động</div>
+          <button id="profileBtn" class="profile-chip">Hồ sơ</button>
+        </div>
+      </header>
+
+      <section id="chat" class="chat-area">
+        <div id="welcome" class="welcome">
+          <div class="hero-orb">
+            <div class="orb-inner">✦</div>
+          </div>
+          <div class="welcome-kicker">NUTRIAI DEMO</div>
+          <h2>Xin chào, mình là NutriAI.</h2>
+          <p>Hệ thống sẽ tìm nội dung phù hợp từ kho <b>knowledge.txt</b> rồi dùng nội dung đó để trả lời bạn.</p>
+
+          <div class="pipeline">
+            <div class="pipe-item"><span class="pipe-num">01</span><div><b>TXT Knowledge</b><small>Kho kiến thức</small></div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-item"><span class="pipe-num">02</span><div><b>Retrieve</b><small>Tìm đoạn liên quan</small></div></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-item"><span class="pipe-num">03</span><div><b>Answer</b><small>Trả lời có nguồn</small></div></div>
+          </div>
+
+          <div class="suggestions">
+            <button data-q="Tôi cao 1m70 nặng 75kg, muốn giảm cân thì nên bắt đầu thế nào?">
+              <span class="suggest-icon">↘</span><span><b>Muốn giảm cân</b><small>Gợi ý bắt đầu</small></span>
+            </button>
+            <button data-q="Protein có vai trò gì khi giảm cân?"><span class="suggest-icon">P</span><span><b>Protein có vai trò gì?</b><small>Kiến thức dinh dưỡng</small></span></button>
+            <button data-q="Gợi ý một bữa sáng cân bằng và dễ chuẩn bị"><span class="suggest-icon">B</span><span><b>Gợi ý bữa sáng</b><small>Cân bằng & dễ làm</small></span></button>
+            <button data-q="BMI của tôi là bao nhiêu nếu cao 1m70 nặng 75kg?"><span class="suggest-icon">BMI</span><span><b>Tính BMI</b><small>Kiểm tra chỉ số cơ bản</small></span></button>
+          </div>
+        </div>
+      </section>
+
+      <div class="composer-area">
+        <div class="composer-shell">
+          <form id="chatForm" class="composer">
+            <textarea id="message" rows="1" aria-label="Tin nhắn" placeholder="Đặt câu hỏi cho NutriAI..."></textarea>
+            <button type="submit" class="send-btn" aria-label="Gửi"><span>↗</span></button>
+          </form>
+          <div class="composer-footer">
+            <span><i></i> RAG local · nguồn TXT</span>
+            <span>Enter để gửi · Shift + Enter để xuống dòng</span>
+          </div>
+        </div>
+        <div class="disclaimer">Thông tin mang tính tham khảo, không thay thế chẩn đoán hoặc điều trị y tế chuyên môn.</div>
+      </div>
+    </main>
+  </div>
+
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><div class="eyebrow">YOUR PROFILE</div><h2>Hồ sơ sức khỏe</h2><p>Lưu thông tin để những lần tính toán sau thuận tiện hơn.</p></div>
+        <button class="close" data-close>×</button>
+      </div>
+      <form id="profileForm" class="form-grid">
+        <label>Tên<input id="pName" placeholder="Nguyễn Văn A"></label>
+        <label>Tuổi<input id="pAge" type="number" min="1" max="120" placeholder="22"></label>
+        <label>Giới tính<select id="pGender"><option value="">Chưa chọn</option><option value="male">Nam</option><option value="female">Nữ</option></select></label>
+        <label>Chiều cao (cm)<input id="pHeight" type="number" step="0.1" placeholder="170"></label>
+        <label>Cân nặng (kg)<input id="pWeight" type="number" step="0.1" placeholder="65"></label>
+        <label>Mục tiêu<select id="pGoal"><option value="">Chưa chọn</option><option>Giảm cân</option><option>Tăng cân</option><option>Duy trì</option><option>Tăng cơ</option></select></label>
+        <label class="span-2">Mức vận động<select id="pActivity"><option value="low">Ít vận động</option><option value="light">Nhẹ</option><option value="moderate">Vừa</option><option value="high">Cao</option><option value="very_high">Rất cao</option></select></label>
+        <div class="form-actions"><button type="button" class="secondary" data-close>Đóng</button><button class="primary">Lưu hồ sơ</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="knowledgeModal" class="modal hidden">
+    <div class="modal-card knowledge-card">
+      <div class="modal-head">
+        <div><div class="eyebrow">RAG KNOWLEDGE</div><h2>Kho kiến thức TXT</h2><p>Nguồn nội dung mà bản demo sử dụng để truy hồi thông tin.</p></div>
+        <button class="close" data-close>×</button>
+      </div>
+      <div class="knowledge-grid">
+        <div class="k-stat"><span id="kDocs">—</span><small>Chủ đề</small></div>
+        <div class="k-stat"><span id="kChunks">—</span><small>Đoạn truy hồi</small></div>
+        <div class="k-stat"><span>TXT</span><small>Nguồn dữ liệu</small></div>
+      </div>
+      <div class="knowledge-file"><span class="file-icon">TXT</span><div><b>data/knowledge.txt</b><small id="kMode">Đang đọc dữ liệu...</small></div><button id="reloadKnowledge" class="reload-btn">↻ Nạp lại</button></div>
+      <div class="knowledge-tip">Bạn có thể mở file <b>data/knowledge.txt</b>, thêm chủ đề mới rồi bấm <b>Nạp lại</b>. Không cần sửa logic trả lời.</div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
