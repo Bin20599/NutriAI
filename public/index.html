@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="vi">
 <head>
@@ -89,7 +90,8 @@
         </div>
         <div class="top-actions">
           <div class="rag-pill"><span></span> RAG đang hoạt động</div>
-          <button id="profileBtn" class="profile-chip">Hồ sơ</button>
+          <button id="authBtn" class="profile-chip" type="button">Đăng nhập</button>
+          <button id="profileBtn" class="profile-chip" type="button">Hồ sơ</button>
         </div>
       </header>
 
@@ -137,12 +139,56 @@
     </main>
   </div>
 
+  <!-- Cửa sổ đăng nhập và đăng ký -->
+  <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow">NUTRIAI ACCOUNT</div>
+          <h2 id="authTitle">Đăng nhập</h2>
+          <p id="authDescription">Đăng nhập để đồng bộ lịch sử trò chuyện và hồ sơ sức khỏe.</p>
+        </div>
+        <button type="button" class="close" data-close aria-label="Đóng">×</button>
+      </div>
+
+      <form id="authForm" class="form-grid">
+        <label class="span-2">
+          Email
+          <input id="authEmail" type="email" placeholder="ban@example.com" required autocomplete="email">
+        </label>
+
+        <label class="span-2">
+          Mật khẩu
+          <input id="authPassword" type="password" placeholder="Ít nhất 6 ký tự" required minlength="6" autocomplete="current-password">
+        </label>
+
+        <p id="authMessage" class="span-2" role="status" aria-live="polite"></p>
+
+        <div class="form-actions">
+          <button type="button" id="authSwitch" class="secondary">Tạo tài khoản</button>
+          <button type="submit" id="authSubmit" class="primary">Đăng nhập</button>
+        </div>
+      </form>
+
+      <div id="signedInPanel" class="hidden">
+        <p>Đang đăng nhập bằng <strong id="authUserEmail"></strong></p>
+        <button type="button" id="authLogout" class="secondary">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hồ sơ sức khỏe -->
   <div id="profileModal" class="modal hidden">
     <div class="modal-card">
       <div class="modal-head">
-        <div><div class="eyebrow">YOUR PROFILE</div><h2>Hồ sơ sức khỏe</h2><p>Lưu thông tin để những lần tính toán sau thuận tiện hơn.</p></div>
+        <div>
+          <div class="eyebrow">YOUR PROFILE</div>
+          <h2>Hồ sơ sức khỏe</h2>
+          <p>Lưu thông tin để những lần tính toán sau thuận tiện hơn.</p>
+        </div>
         <button class="close" data-close>×</button>
       </div>
+
       <form id="profileForm" class="form-grid">
         <label>Tên<input id="pName" placeholder="Nguyễn Văn A"></label>
         <label>Tuổi<input id="pAge" type="number" min="1" max="120" placeholder="22"></label>
@@ -151,30 +197,47 @@
         <label>Cân nặng (kg)<input id="pWeight" type="number" step="0.1" placeholder="65"></label>
         <label>Mục tiêu<select id="pGoal"><option value="">Chưa chọn</option><option>Giảm cân</option><option>Tăng cân</option><option>Duy trì</option><option>Tăng cơ</option></select></label>
         <label class="span-2">Mức vận động<select id="pActivity"><option value="low">Ít vận động</option><option value="light">Nhẹ</option><option value="moderate">Vừa</option><option value="high">Cao</option><option value="very_high">Rất cao</option></select></label>
-        <div class="form-actions"><button type="button" class="secondary" data-close>Đóng</button><button class="primary">Lưu hồ sơ</button></div>
+        <div class="form-actions">
+          <button type="button" class="secondary" data-close>Đóng</button>
+          <button class="primary">Lưu hồ sơ</button>
+        </div>
       </form>
     </div>
   </div>
 
+  <!-- Kho kiến thức -->
   <div id="knowledgeModal" class="modal hidden">
     <div class="modal-card knowledge-card">
       <div class="modal-head">
-        <div><div class="eyebrow">RAG KNOWLEDGE</div><h2>Kho kiến thức TXT</h2><p>Nguồn nội dung mà bản demo sử dụng để truy hồi thông tin.</p></div>
+        <div>
+          <div class="eyebrow">RAG KNOWLEDGE</div>
+          <h2>Kho kiến thức TXT</h2>
+          <p>Nguồn nội dung mà bản demo sử dụng để truy hồi thông tin.</p>
+        </div>
         <button class="close" data-close>×</button>
       </div>
+
       <div class="knowledge-grid">
         <div class="k-stat"><span id="kDocs">—</span><small>Chủ đề</small></div>
         <div class="k-stat"><span id="kChunks">—</span><small>Đoạn truy hồi</small></div>
         <div class="k-stat"><span>TXT</span><small>Nguồn dữ liệu</small></div>
       </div>
-      <div class="knowledge-file"><span class="file-icon">TXT</span><div><b>data/knowledge.txt</b><small id="kMode">Đang đọc dữ liệu...</small></div><button id="reloadKnowledge" class="reload-btn">↻ Nạp lại</button></div>
+
+      <div class="knowledge-file">
+        <span class="file-icon">TXT</span>
+        <div><b>data/knowledge.txt</b><small id="kMode">Đang đọc dữ liệu...</small></div>
+        <button id="reloadKnowledge" class="reload-btn">↻ Nạp lại</button>
+      </div>
+
       <div class="knowledge-tip">Bạn có thể mở file <b>data/knowledge.txt</b>, thêm chủ đề mới rồi bấm <b>Nạp lại</b>. Không cần sửa logic trả lời.</div>
     </div>
   </div>
 
- <div id="toast"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
+  <!-- Thư viện Supabase phải được tải trước app.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
 </body>
 </html>
+```
