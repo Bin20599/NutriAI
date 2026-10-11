@@ -500,3 +500,305 @@ Nếu người dùng hỏi về học tập hoặc công nghệ, NutriAI có th�
 [TAGS] tin tức, thời gian thực, web, API, dữ liệu cập nhật
 [CONTENT]
 Tin tức, giá cả, tỷ số thể thao, thời tiết và các sự kiện mới thay đổi liên tục không nên được coi là dữ liệu tĩnh trong knowledge.txt. Bản demo có thể giải thích giới hạn này. Bản chính thức có thể tích hợp API hoặc web retrieval cho các câu hỏi cần thông tin mới nhất. Khi kết hợp RAG với dữ liệu thời gian thực, cần phân biệt nguồn kiến thức ổn định với dữ liệu động và hiển thị thời điểm hoặc nguồn nếu phù hợp.
+# NUTRIAI — GÓI KIẾN THỨC BỔ SUNG
+# Sao chép các khối [TITLE]/[TAGS]/[CONTENT] và nối vào cuối data/knowledge.txt.
+# Không xóa dữ liệu hiện có. Thông tin thời tiết, tỷ số trực tiếp và tin tức cần nguồn cập nhật.
+[TITLE] Sinh học tổng quan
+[TAGS] sinh học, biology, sự sống, tế bào, sinh vật
+[CONTENT]
+Sinh học nghiên cứu sự sống từ phân tử, tế bào, cơ thể đến quần thể và hệ sinh thái. Các nhánh chính gồm di truyền học, sinh lý học, sinh thái học, tiến hóa, vi sinh học và sinh học phân tử. Khi tìm hiểu một kết luận sinh học, cần phân biệt quan sát, giả thuyết, bằng chứng thực nghiệm và cách diễn giải. Kiến thức khoa học có thể được cập nhật khi xuất hiện dữ liệu mới.
+
+[TITLE] Tế bào và bào quan
+[TAGS] tế bào, cell, màng tế bào, nhân, ti thể, ribosome
+[CONTENT]
+Tế bào là đơn vị cấu trúc và chức năng cơ bản của phần lớn sinh vật. Màng tế bào điều hòa trao đổi với môi trường; tế bào nhân thực có nhân chứa phần lớn DNA. Ti thể tham gia tạo ATP, ribosome tổng hợp protein, còn lưới nội chất và bộ máy Golgi xử lý hoặc vận chuyển nhiều phân tử. Tế bào vi khuẩn không có nhân được bao bởi màng nhân như tế bào nhân thực.
+
+[TITLE] DNA, gene và di truyền
+[TAGS] DNA, gene, gen, nhiễm sắc thể, di truyền học
+[CONTENT]
+DNA lưu trữ thông tin di truyền ở hầu hết sinh vật. Gene là một vùng DNA có chức năng, thường liên quan đến tạo RNA hoặc protein. DNA được đóng gói thành nhiễm sắc thể. Nhiều tính trạng ở người chịu ảnh hưởng đồng thời của nhiều gene và môi trường, vì vậy không phải mọi đặc điểm đều do một gene duy nhất quyết định.
+
+[TITLE] RNA và tổng hợp protein
+[TAGS] RNA, mRNA, ribosome, protein, phiên mã, dịch mã
+[CONTENT]
+Trong quá trình biểu hiện gene điển hình, thông tin DNA được phiên mã thành RNA; mRNA có thể được ribosome dịch mã thành chuỗi amino acid để tạo protein. Các loại RNA khác như tRNA và rRNA cũng có vai trò quan trọng. Điều hòa biểu hiện gene giúp tế bào tạo ra sản phẩm phù hợp với loại tế bào và điều kiện môi trường.
+
+[TITLE] Phân bào, nguyên phân và giảm phân
+[TAGS] nguyên phân, giảm phân, mitosis, meiosis, giao tử, phân bào
+[CONTENT]
+Nguyên phân giúp tạo hai nhân con có bộ nhiễm sắc thể tương đương trong điều kiện bình thường và tham gia tăng trưởng, thay thế tế bào. Giảm phân làm giảm một nửa số nhiễm sắc thể để tạo tế bào phục vụ sinh sản hữu tính. Trao đổi chéo và phân ly độc lập góp phần tạo biến dị di truyền. Sai sót trong kiểm soát chu kỳ tế bào có thể góp phần gây bệnh.
+
+[TITLE] Tiến hóa và chọn lọc tự nhiên
+[TAGS] tiến hóa, evolution, chọn lọc tự nhiên, thích nghi, biến dị
+[CONTENT]
+Tiến hóa là sự thay đổi đặc điểm di truyền của quần thể qua các thế hệ. Đột biến, tái tổ hợp, chọn lọc tự nhiên, phiêu bạt di truyền và dòng gene góp phần tạo ra biến đổi tiến hóa. Chọn lọc tự nhiên có thể làm đặc điểm giúp sinh vật sinh sản thành công trở nên phổ biến hơn trong môi trường nhất định. Tiến hóa không có mục tiêu định trước.
+
+[TITLE] Hệ sinh thái và chuỗi thức ăn
+[TAGS] hệ sinh thái, sinh thái học, chuỗi thức ăn, lưới thức ăn, năng lượng
+[CONTENT]
+Hệ sinh thái gồm sinh vật và môi trường vật lý tương tác với nhau. Năng lượng thường đi vào hệ qua sinh vật sản xuất như thực vật và tảo, rồi truyền qua các bậc dinh dưỡng; một phần năng lượng thất thoát dưới dạng nhiệt ở mỗi bậc. Lưới thức ăn mô tả nhiều quan hệ dinh dưỡng đan xen. Vật chất như carbon và nitrogen được tuần hoàn trong hệ sinh thái.
+
+[TITLE] Vi khuẩn, virus và vi sinh vật
+[TAGS] vi khuẩn, virus, vi sinh vật, microbiology, lây nhiễm
+[CONTENT]
+Vi sinh vật gồm nhiều nhóm như vi khuẩn, cổ khuẩn, nấm men và sinh vật nguyên sinh. Virus thường được nghiên cứu cùng vi sinh học nhưng không phải tế bào và cần tế bào chủ để nhân lên. Nhiều vi sinh vật có ích trong tiêu hóa, phân hủy và sản xuất thực phẩm; một số gây bệnh. Phòng bệnh cần biện pháp phù hợp đường lây, như vệ sinh tay, thông khí, tiêm chủng hoặc kiểm soát côn trùng.
+
+[TITLE] Hệ miễn dịch và vaccine
+[TAGS] miễn dịch, kháng thể, tế bào miễn dịch, vaccine, tiêm chủng
+[CONTENT]
+Hệ miễn dịch gồm cơ chế bẩm sinh và miễn dịch thích ứng. Miễn dịch bẩm sinh phản ứng nhanh; miễn dịch thích ứng sử dụng tế bào lympho và kháng thể để nhận diện mục tiêu cụ thể, đồng thời có thể hình thành trí nhớ miễn dịch. Vaccine giúp hệ miễn dịch chuẩn bị nhận diện tác nhân hoặc thành phần của chúng. Hiệu quả và lịch tiêm phụ thuộc loại vaccine, tuổi, tình trạng sức khỏe và khuyến nghị y tế hiện hành.
+
+[TITLE] Hệ tuần hoàn và tim
+[TAGS] tim, tuần hoàn, máu, mạch máu, huyết áp
+[CONTENT]
+Tim bơm máu qua hệ mạch để vận chuyển oxy, chất dinh dưỡng, hormone và sản phẩm chuyển hóa. Động mạch đưa máu rời tim, tĩnh mạch đưa máu về tim, còn mao mạch là nơi trao đổi nhiều chất với mô. Huyết áp chịu ảnh hưởng của hoạt động tim, sức cản mạch và nhiều yếu tố khác. Đau ngực nghiêm trọng, khó thở nặng, ngất hoặc dấu hiệu đột quỵ cần được xử trí khẩn cấp.
+
+[TITLE] Hệ hô hấp và trao đổi khí
+[TAGS] hô hấp, phổi, oxy, carbon dioxide, trao đổi khí
+[CONTENT]
+Hệ hô hấp đưa oxy vào cơ thể và thải carbon dioxide. Không khí đi qua đường hô hấp đến phế nang, nơi khí trao đổi giữa không khí và máu. Nhịp thở thay đổi theo vận động, cảm xúc, độ cao và sức khỏe. Khó thở mới xuất hiện hoặc nặng, tím tái hay đau ngực cần được đánh giá y tế khẩn cấp.
+
+[TITLE] Hệ tiêu hóa
+[TAGS] tiêu hóa, dạ dày, ruột non, ruột già, enzyme
+[CONTENT]
+Hệ tiêu hóa phân giải thức ăn thành các phân tử nhỏ để hấp thu. Miệng nghiền thức ăn và bắt đầu tiêu hóa một số carbohydrate; dạ dày trộn thức ăn với dịch tiêu hóa; ruột non hấp thu phần lớn chất dinh dưỡng; ruột già hấp thu nước và hỗ trợ hệ vi sinh đường ruột. Chức năng tiêu hóa chịu ảnh hưởng của chế độ ăn, thuốc, bệnh lý và nhiều yếu tố khác.
+
+[TITLE] Não bộ và hệ thần kinh
+[TAGS] não, hệ thần kinh, neuron, trí nhớ, nhận thức
+[CONTENT]
+Hệ thần kinh tiếp nhận tín hiệu, xử lý thông tin và điều khiển nhiều hoạt động cơ thể. Neuron truyền tín hiệu điện và hóa học; tế bào thần kinh đệm hỗ trợ hoạt động của hệ thần kinh. Giấc ngủ, học tập, vận động và sức khỏe tổng thể ảnh hưởng đến chức năng nhận thức. Đột ngột méo miệng, yếu một bên người hoặc khó nói có thể là dấu hiệu đột quỵ và cần cấp cứu.
+
+[TITLE] Hormone và hệ nội tiết
+[TAGS] hormone, nội tiết, tuyến giáp, insulin, cortisol
+[CONTENT]
+Hormone là chất truyền tin hóa học giúp điều phối chuyển hóa, tăng trưởng, sinh sản và phản ứng với stress. Insulin tham gia điều hòa glucose máu; hormone tuyến giáp ảnh hưởng đến nhiều quá trình chuyển hóa; cortisol tham gia đáp ứng stress. Hormone tương tác phức tạp, nên không thể chẩn đoán rối loạn nội tiết chỉ từ một triệu chứng hoặc một xét nghiệm đơn lẻ.
+
+[TITLE] Khoa học thể thao tổng quan
+[TAGS] thể thao, sports science, sinh lý vận động, hiệu suất, thể lực
+[CONTENT]
+Khoa học thể thao nghiên cứu cách cơ thể đáp ứng với vận động, tập luyện, dinh dưỡng, tâm lý và phục hồi. Các yếu tố hiệu suất gồm sức mạnh, sức bền, tốc độ, kỹ thuật, chiến thuật, giấc ngủ và khả năng thích nghi. Kế hoạch tập hiệu quả cần phù hợp mục tiêu, trình độ, lịch sinh hoạt và sức khỏe. Không có một chương trình tối ưu cho tất cả vận động viên.
+
+[TITLE] Tăng tải tiến triển trong tập luyện
+[TAGS] tăng tải, progressive overload, tập gym, thích nghi, sức mạnh
+[CONTENT]
+Tăng tải tiến triển nghĩa là tăng dần một hoặc nhiều yếu tố tập luyện như khối lượng, số lần lặp, thời lượng hoặc độ khó khi cơ thể đã thích nghi. Tăng quá nhanh có thể làm tăng nguy cơ chấn thương và mệt mỏi. Nên theo dõi kỹ thuật, cảm giác gắng sức, giấc ngủ và khả năng phục hồi. Tiến bộ không phải lúc nào cũng tuyến tính; giai đoạn giảm tải có thể cần thiết.
+
+[TITLE] Khởi động và thả lỏng
+[TAGS] khởi động, warm-up, cooldown, thể thao, chấn thương
+[CONTENT]
+Khởi động tăng dần cường độ giúp cơ thể chuẩn bị cho vận động, có thể gồm vận động nhẹ và động tác linh hoạt phù hợp môn thể thao. Trước hoạt động tốc độ cao, nên thêm động tác chuyên biệt gần với yêu cầu thi đấu. Thả lỏng nhẹ sau tập giúp chuyển tiếp về trạng thái nghỉ nhưng không bảo đảm ngăn hoàn toàn đau cơ hoặc chấn thương.
+
+[TITLE] Sức mạnh, sức bền và tốc độ
+[TAGS] sức mạnh, sức bền, tốc độ, thể lực, huấn luyện
+[CONTENT]
+Sức mạnh là khả năng tạo lực; sức bền là khả năng duy trì hoạt động; tốc độ liên quan đến thực hiện chuyển động nhanh. Các năng lực này bổ trợ nhau nhưng cần phương pháp huấn luyện khác nhau. Tập sức mạnh thường dùng sức cản; sức bền thường cần hoạt động lặp lại hoặc kéo dài; tốc độ đòi hỏi kỹ thuật, chất lượng vận động và thời gian nghỉ phù hợp.
+
+[TITLE] Chấn thương thể thao và phòng ngừa
+[TAGS] chấn thương thể thao, bong gân, căng cơ, phòng ngừa
+[CONTENT]
+Nguy cơ chấn thương có thể giảm nhờ kỹ thuật đúng, tăng tải từ từ, trang thiết bị phù hợp, ngủ đủ và điều chỉnh tập khi mệt mỏi. Đau dữ dội, biến dạng, sưng nhanh, không thể chịu lực hoặc tê yếu cần được đánh giá y tế. Không nên cố tập xuyên qua cơn đau cấp tính. Chẩn đoán và phục hồi chấn thương nên do người có chuyên môn hướng dẫn.
+
+[TITLE] Bóng đá: luật và vị trí cơ bản
+[TAGS] bóng đá, football, soccer, thủ môn, hậu vệ, tiền vệ, tiền đạo
+[CONTENT]
+Bóng đá là môn đồng đội trong đó hai đội tìm cách ghi bàn vào khung thành đối phương. Các vị trí thường gồm thủ môn, hậu vệ, tiền vệ và tiền đạo; vai trò cụ thể phụ thuộc sơ đồ chiến thuật. Luật việt vị liên quan đến vị trí cầu thủ tấn công khi đồng đội chuyền bóng và sự tham gia vào tình huống. Tỷ số, lịch thi đấu và đội hình thay đổi theo thời gian, nên cần nguồn cập nhật.
+
+[TITLE] Bóng rổ: kỹ năng và luật cơ bản
+[TAGS] bóng rổ, basketball, ném bóng, dẫn bóng, rebound
+[CONTENT]
+Bóng rổ là môn thể thao đồng đội, mục tiêu là đưa bóng vào rổ đối phương và ngăn đối phương ghi điểm. Kỹ năng cơ bản gồm dẫn bóng, chuyền, ném, phòng thủ và bắt bóng bật bảng. Luật về bước chạy, lỗi cá nhân, thời gian tấn công và cách tính điểm có thể khác đôi chút theo giải đấu. Người chơi nên luyện kỹ thuật, thể lực, phối hợp và ra quyết định.
+
+[TITLE] Cầu lông, tennis và thể thao dùng vợt
+[TAGS] cầu lông, badminton, tennis, vợt, phản xạ
+[CONTENT]
+Cầu lông và tennis đều là môn dùng vợt nhưng khác về sân, dụng cụ, luật và nhịp độ. Cả hai đòi hỏi phối hợp tay mắt, di chuyển, phản xạ và kiểm soát lực. Khởi động vai, cổ tay, hông và chân; tăng thời lượng chơi từ từ; dùng giày phù hợp với mặt sân có thể giúp giảm nguy cơ chấn thương. Nên học kỹ thuật cơ bản trước khi tăng tốc độ.
+
+[TITLE] Bơi lội và an toàn dưới nước
+[TAGS] bơi, swimming, an toàn nước, kỹ thuật bơi
+[CONTENT]
+Bơi lội rèn sức bền và phối hợp toàn thân, nhưng an toàn dưới nước luôn là ưu tiên. Chỉ bơi ở khu vực được phép, chú ý biển báo, dòng chảy và hướng dẫn cứu hộ. Trẻ em cần được giám sát liên tục gần nước; phao không thay thế giám sát. Người mới nên học kỹ thuật thở và nổi từ người hướng dẫn đủ năng lực, không bơi một mình ở nơi nguy hiểm.
+
+[TITLE] Chạy bộ và xây dựng kế hoạch
+[TAGS] chạy bộ, chạy đường dài, jogging, pace, kilomet
+[CONTENT]
+Người mới chạy bộ nên bắt đầu bằng xen kẽ đi bộ và chạy nhẹ, sau đó tăng tổng thời gian từ từ. Pace là thời gian hoàn thành một đơn vị quãng đường, thường tính bằng phút mỗi kilomet. Nên chọn giày vừa chân, có ngày nghỉ và không tăng đột ngột cả tốc độ lẫn quãng đường. Đau làm thay đổi dáng chạy hoặc triệu chứng toàn thân là tín hiệu cần giảm tải và đánh giá.
+
+[TITLE] Thời tiết và khí hậu
+[TAGS] thời tiết, khí hậu, weather, climate, khí tượng
+[CONTENT]
+Thời tiết mô tả trạng thái khí quyển tại một nơi và thời điểm, như nhiệt độ, mưa, gió, mây và độ ẩm. Khí hậu mô tả đặc điểm thống kê của thời tiết trong thời gian dài. Một ngày lạnh không phủ định xu hướng khí hậu dài hạn. Dự báo có độ bất định và thường kém chính xác hơn khi dự báo xa. Thông tin hiện tại cần dữ liệu khí tượng cập nhật; file TXT tĩnh không thể cho biết thời tiết hôm nay.
+
+[TITLE] Nhiệt độ, độ ẩm và cảm giác nóng
+[TAGS] nhiệt độ, độ ẩm, cảm giác nóng, heat index
+[CONTENT]
+Nhiệt độ không khí không phải yếu tố duy nhất quyết định cảm giác nóng. Độ ẩm cao làm mồ hôi bay hơi kém hiệu quả, khiến cơ thể khó tản nhiệt. Gió, bức xạ mặt trời, quần áo, hoạt động thể chất và khả năng thích nghi cũng ảnh hưởng cảm giác nóng. Khi trời nóng, nên tìm bóng râm, nghỉ trong môi trường mát và giảm cường độ vận động nếu cần.
+
+[TITLE] Mưa, mây và độ ẩm
+[TAGS] mưa, mây, độ ẩm, hơi nước, ngưng tụ
+[CONTENT]
+Mây hình thành khi hơi nước ngưng tụ hoặc đóng băng thành hạt nhỏ trong khí quyển. Mưa xảy ra khi giọt nước hoặc tinh thể băng phát triển đủ lớn để rơi xuống mặt đất. Độ ẩm tương đối là tỷ lệ giữa lượng hơi nước hiện có và lượng tối đa không khí có thể chứa ở cùng nhiệt độ. Mây đen hoặc độ ẩm cao có thể gợi ý thời tiết thay đổi nhưng không đủ để dự báo chính xác lượng mưa.
+
+[TITLE] Gió và áp suất khí quyển
+[TAGS] gió, áp suất khí quyển, áp thấp, áp cao
+[CONTENT]
+Gió hình thành chủ yếu do chênh lệch áp suất khí quyển, đồng thời chịu ảnh hưởng của sự quay Trái Đất và địa hình. Vùng áp thấp thường gắn với không khí đi lên, còn vùng áp cao thường có chuyển động đi xuống, nhưng thời tiết thực tế phụ thuộc nhiều yếu tố. Gió mạnh có thể gây nguy hiểm cho cây cối, công trình và giao thông. Cảnh báo gió mạnh cần dựa vào bản tin khí tượng chính thức.
+
+[TITLE] Bão nhiệt đới và áp thấp nhiệt đới
+[TAGS] bão, áp thấp nhiệt đới, gió mạnh, mưa lớn, khí tượng
+[CONTENT]
+Bão nhiệt đới là hệ thống áp thấp mạnh hình thành trên vùng biển đủ ấm, có thể gây gió mạnh, mưa lớn, nước dâng và lũ. Đường đi và cường độ dự báo có sai số, nên cần theo dõi bản tin mới nhất từ cơ quan khí tượng chính thức. Khi có cảnh báo, hãy chuẩn bị vật dụng cần thiết, tránh vùng ngập, không trú dưới cây hoặc công trình yếu và tuân thủ hướng dẫn sơ tán.
+
+[TITLE] Dông, sét và mưa đá
+[TAGS] dông, sét, mưa đá, giông lốc, an toàn thời tiết
+[CONTENT]
+Dông có thể kèm sét, gió giật, mưa lớn hoặc mưa đá. Khi nghe sấm, nên vào tòa nhà kiên cố hoặc xe có mái kín; tránh trú dưới cây đơn độc, tránh vùng nước và không đứng ở nơi trống trải. Không có tư thế ngoài trời nào bảo đảm an toàn tuyệt đối. Theo dõi cảnh báo địa phương và tránh ra ngoài khi có dông mạnh.
+
+[TITLE] Lũ lụt và ngập úng
+[TAGS] lũ lụt, ngập, mưa lớn, nước dâng, an toàn
+[CONTENT]
+Lũ có thể xuất hiện nhanh sau mưa lớn, vỡ đập hoặc nước dâng. Không đi bộ, đi xe máy hay lái ô tô qua dòng nước ngập vì độ sâu và sức chảy khó đánh giá. Tránh dây điện rơi, giếng hở và nước có thể bị ô nhiễm. Nếu có lệnh sơ tán, hãy làm theo hướng dẫn của cơ quan chức năng. Dự báo và mức cảnh báo phải dựa trên thông tin địa phương cập nhật.
+
+[TITLE] Nắng nóng, mất nước và sốc nhiệt
+[TAGS] nắng nóng, sốc nhiệt, heat stroke, mất nước, thời tiết
+[CONTENT]
+Nắng nóng có thể gây mất nước, kiệt sức do nóng và sốc nhiệt. Dấu hiệu nguy hiểm có thể gồm lú lẫn, ngất, co giật hoặc thân nhiệt rất cao. Khi nghi ngờ sốc nhiệt, cần gọi cấp cứu, đưa người bệnh đến nơi mát và làm mát nhanh trong khi chờ trợ giúp. Người cao tuổi, trẻ nhỏ, người làm ngoài trời và người có bệnh nền có nguy cơ cao hơn.
+
+[TITLE] Chỉ số UV và bảo vệ da
+[TAGS] UV, tia cực tím, chống nắng, da, ánh nắng
+[CONTENT]
+Chỉ số UV biểu thị mức bức xạ cực tím gây tác động lên da và mắt. Khi UV cao, có thể tìm bóng râm, mặc quần áo che phủ, đội mũ, đeo kính chống UV và dùng kem chống nắng phổ rộng phù hợp. Mây không loại bỏ hoàn toàn tia UV. Chỉ số UV hiện tại thay đổi theo vị trí và thời gian, cần nguồn thời tiết cập nhật.
+
+[TITLE] Chất lượng không khí và bụi mịn
+[TAGS] AQI, chất lượng không khí, PM2.5, ô nhiễm không khí
+[CONTENT]
+Chất lượng không khí có thể được mô tả bằng chỉ số AQI, nhưng cách tính và ngưỡng có thể khác giữa hệ thống. PM2.5 là hạt bụi nhỏ có thể đi sâu vào đường hô hấp. Khi ô nhiễm cao, người nhạy cảm có thể giảm hoạt động gắng sức ngoài trời và theo dõi khuyến cáo địa phương. Số liệu AQI theo giờ cần nguồn quan trắc cập nhật; TXT tĩnh không thể cho biết chất lượng không khí hiện tại.
+
+[TITLE] Biến đổi khí hậu
+[TAGS] biến đổi khí hậu, khí nhà kính, nóng lên toàn cầu, carbon
+[CONTENT]
+Biến đổi khí hậu hiện đại chủ yếu liên quan đến sự gia tăng khí nhà kính do hoạt động con người, đặc biệt việc đốt nhiên liệu hóa thạch và thay đổi sử dụng đất. Tác động có thể gồm nhiệt độ trung bình tăng, mực nước biển dâng và thay đổi nguy cơ của một số hiện tượng cực đoan. Một sự kiện thời tiết riêng lẻ không đủ để quy kết nguyên nhân khí hậu; cần phân tích dữ liệu dài hạn.
+
+[TITLE] Chu trình nước
+[TAGS] chu trình nước, bốc hơi, ngưng tụ, mưa, nước ngầm
+[CONTENT]
+Chu trình nước mô tả sự lưu chuyển của nước qua bốc hơi, thoát hơi nước từ thực vật, ngưng tụ, giáng thủy, dòng chảy mặt và thấm xuống đất. Mặt trời cung cấp năng lượng cho phần lớn quá trình bốc hơi. Rừng, đất, hồ, sông và đại dương ảnh hưởng đến cách nước được lưu trữ và di chuyển. Đô thị hóa và khai thác nước ngầm có thể làm thay đổi chu trình nước địa phương.
+
+[TITLE] Động đất và an toàn
+[TAGS] động đất, địa chấn, đứt gãy, sóng địa chấn
+[CONTENT]
+Động đất thường xảy ra khi năng lượng tích tụ trong đá được giải phóng đột ngột dọc theo đứt gãy. Trong lúc rung lắc, nên cúi thấp, che đầu và cổ, bám chắc dưới đồ nội thất vững nếu có; tránh kính và không sử dụng thang máy. Sau động đất, chú ý dư chấn, hư hỏng công trình và hướng dẫn của cơ quan chức năng.
+
+[TITLE] Đại dương và thủy triều
+[TAGS] đại dương, thủy triều, sóng biển, dòng hải lưu
+[CONTENT]
+Đại dương điều hòa khí hậu, vận chuyển nhiệt và là môi trường sống của nhiều sinh vật. Thủy triều chủ yếu liên quan lực hấp dẫn của Mặt Trăng và Mặt Trời cùng chuyển động Trái Đất. Sóng biển thường được tạo bởi gió, trong khi dòng hải lưu chịu ảnh hưởng của gió, chênh lệch mật độ, địa hình và sự quay của Trái Đất. Điều kiện biển thay đổi theo vị trí và thời gian; cần theo dõi cảnh báo trước khi đi biển.
+
+[TITLE] Vật lý: lực và chuyển động
+[TAGS] vật lý, lực, chuyển động, gia tốc, Newton
+[CONTENT]
+Lực có thể làm thay đổi chuyển động hoặc hình dạng của vật. Theo định luật II Newton, gia tốc phụ thuộc lực tổng hợp và khối lượng, thường biểu diễn F = ma trong cơ học cổ điển. Vận tốc gồm độ lớn và hướng, còn tốc độ chỉ thể hiện độ lớn. Khi giải bài tập, cần xác định hệ quy chiếu, đơn vị và các lực tác dụng trước khi thay số.
+
+[TITLE] Năng lượng và công suất
+[TAGS] năng lượng, công, công suất, joule, watt
+[CONTENT]
+Năng lượng mô tả khả năng thực hiện công hoặc gây biến đổi. Các dạng gồm động năng, thế năng, nhiệt năng, hóa năng và điện năng. Công suất là tốc độ thực hiện công hoặc chuyển đổi năng lượng, thường đo bằng watt. Năng lượng có thể chuyển từ dạng này sang dạng khác; trong hệ phù hợp, tổng năng lượng được bảo toàn dù có thể có tổn hao hữu ích.
+
+[TITLE] Điện và mạch điện cơ bản
+[TAGS] điện, dòng điện, điện áp, điện trở, mạch điện
+[CONTENT]
+Dòng điện là sự chuyển động có hướng của điện tích. Điện áp biểu thị chênh lệch điện thế, còn điện trở mô tả mức cản dòng điện. Với điện trở thuần trong điều kiện phù hợp, định luật Ohm có dạng V = IR. Điện có thể gây điện giật và cháy; không chạm dây điện hở hoặc thiết bị đang ướt, và nên để việc sửa điện lưới cho người có chuyên môn.
+
+[TITLE] Hóa học: nguyên tử và phân tử
+[TAGS] hóa học, nguyên tử, phân tử, proton, neutron, electron
+[CONTENT]
+Nguyên tử gồm hạt nhân chứa proton và thường có neutron, cùng electron ở vùng xung quanh. Nguyên tố được xác định bởi số proton trong hạt nhân. Phân tử gồm các nguyên tử liên kết với nhau; chất có thể được phân loại thành nguyên tố, hợp chất và hỗn hợp. Tính chất hóa học phụ thuộc cấu trúc electron và cách các nguyên tử tương tác.
+
+[TITLE] pH, acid và base
+[TAGS] pH, axit, acid, bazơ, base, hóa học
+[CONTENT]
+pH là thang đo liên quan đến hoạt độ ion hydrogen trong dung dịch nước. Dung dịch acid thường có pH thấp hơn 7, dung dịch trung tính gần 7 ở điều kiện chuẩn thông thường, còn dung dịch base có pH cao hơn 7. Giá trị thực tế phụ thuộc nhiệt độ và thành phần dung dịch. Không được nếm hoặc trộn hóa chất gia dụng để thử pH; một số hỗn hợp có thể tạo khí độc hoặc phản ứng nguy hiểm.
+
+[TITLE] Toán học: tỷ lệ và phần trăm
+[TAGS] toán học, tỷ lệ, phần trăm, phần trăm thay đổi
+[CONTENT]
+Tỷ lệ so sánh hai đại lượng bằng phép chia; phần trăm biểu diễn một phần trên một trăm. Phần trăm thay đổi thường được tính bằng (giá trị mới trừ giá trị cũ) chia giá trị cũ rồi nhân 100 phần trăm, nếu giá trị cũ khác 0. Khi so sánh phần trăm, cần kiểm tra đơn vị và mẫu số. Tăng 20 phần trăm rồi giảm 20 phần trăm không đưa giá trị về ban đầu.
+
+[TITLE] Thống kê và xác suất
+[TAGS] thống kê, xác suất, trung bình, trung vị, dữ liệu
+[CONTENT]
+Thống kê mô tả dữ liệu bằng các đại lượng như trung bình, trung vị và độ phân tán. Trung bình nhạy với giá trị ngoại lệ, trong khi trung vị thường bền vững hơn với một số phân phối lệch. Xác suất biểu thị mức độ khả dĩ của sự kiện trong một mô hình. Tương quan không tự động chứng minh quan hệ nhân quả; cần xem xét thiết kế nghiên cứu và các yếu tố gây nhiễu.
+
+[TITLE] Lập trình và thuật toán
+[TAGS] lập trình, code, thuật toán, Python, JavaScript, phần mềm
+[CONTENT]
+Lập trình mô tả các bước để máy tính thực hiện nhiệm vụ. Thuật toán cần có đầu vào, quy trình và đầu ra rõ ràng. Khi xây dựng phần mềm, nên chia chức năng thành mô-đun, kiểm tra dữ liệu đầu vào, xử lý lỗi và viết kiểm thử. Code chạy được chưa chắc đã đúng hoặc an toàn; cần kiểm tra trường hợp biên, quyền truy cập và bảo vệ dữ liệu.
+
+[TITLE] Trí tuệ nhân tạo và học máy
+[TAGS] AI, trí tuệ nhân tạo, machine learning, mô hình, dữ liệu
+[CONTENT]
+Trí tuệ nhân tạo xây dựng hệ thống thực hiện các nhiệm vụ như nhận diện, dự đoán, tạo nội dung hoặc hỗ trợ quyết định. Học máy dùng dữ liệu để học các mẫu thay vì chỉ lập trình quy tắc cố định. Kết quả phụ thuộc dữ liệu, mục tiêu, cách đánh giá và bối cảnh. Mô hình có thể sai hoặc tạo thông tin không có căn cứ, vì vậy các quyết định quan trọng cần kiểm chứng.
+
+[TITLE] An toàn thông tin và mật khẩu
+[TAGS] an toàn thông tin, bảo mật, mật khẩu, MFA, phishing
+[CONTENT]
+An toàn thông tin nhằm bảo vệ tính bí mật, toàn vẹn và khả dụng của dữ liệu. Nên dùng mật khẩu dài, riêng biệt cho từng dịch vụ, bật xác thực đa yếu tố khi có thể và không chia sẻ mã xác minh. Cảnh giác với liên kết giả mạo hoặc yêu cầu cung cấp mật khẩu. Không đưa secret key vào mã frontend hoặc repository công khai.
+
+[TITLE] Internet và điện toán đám mây
+[TAGS] internet, cloud, điện toán đám mây, server, hosting
+[CONTENT]
+Internet kết nối các hệ thống theo giao thức chung. Điện toán đám mây cung cấp tài nguyên như máy chủ, lưu trữ và cơ sở dữ liệu qua mạng. Dịch vụ cloud giúp triển khai ứng dụng nhanh nhưng vẫn cần cấu hình quyền truy cập, sao lưu, giám sát chi phí và bảo mật khóa bí mật. Secret key chỉ nên nằm ở môi trường máy chủ được bảo vệ.
+
+[TITLE] Cơ sở dữ liệu và SQL
+[TAGS] database, cơ sở dữ liệu, SQL, bảng, truy vấn
+[CONTENT]
+Cơ sở dữ liệu lưu trữ dữ liệu để truy vấn và cập nhật. SQL thường dùng để tạo bảng, lọc, kết hợp và tổng hợp dữ liệu quan hệ. Khóa chính định danh bản ghi; khóa ngoại thể hiện quan hệ giữa bảng. Cần xác thực và phân quyền truy cập, dùng truy vấn tham số hóa để giảm nguy cơ SQL injection, đồng thời sao lưu và kiểm tra khả năng khôi phục.
+
+[TITLE] Địa lý và bản đồ
+[TAGS] địa lý, bản đồ, tọa độ, kinh độ, vĩ độ
+[CONTENT]
+Địa lý nghiên cứu vị trí, môi trường tự nhiên và hoạt động con người trên bề mặt Trái Đất. Vĩ độ cho biết vị trí bắc-nam so với xích đạo, kinh độ cho biết vị trí đông-tây so với kinh tuyến gốc. Bản đồ biểu diễn bề mặt cong lên mặt phẳng nên có dạng biến dạng nhất định. Khi dùng tọa độ, cần kiểm tra hệ tọa độ, đơn vị và độ chính xác.
+
+[TITLE] Lịch sử và đánh giá nguồn tư liệu
+[TAGS] lịch sử, tư liệu, bằng chứng, niên đại, sử học
+[CONTENT]
+Lịch sử nghiên cứu các sự kiện và quá trình trong quá khứ dựa trên tư liệu, hiện vật, lời kể và phương pháp phân tích. Nguồn sơ cấp được tạo ra trong hoặc gần thời kỳ nghiên cứu; nguồn thứ cấp phân tích hoặc tổng hợp nguồn khác. Một tư liệu có thể thiên lệch hoặc không đầy đủ, nên cần đối chiếu nhiều nguồn độc lập và xem xét bối cảnh.
+
+[TITLE] Kinh tế học cơ bản
+[TAGS] kinh tế, cung cầu, lạm phát, thị trường, chi phí cơ hội
+[CONTENT]
+Kinh tế học nghiên cứu cách cá nhân và xã hội phân bổ nguồn lực khan hiếm. Cung và cầu tương tác để hình thành giá trong nhiều thị trường, nhưng giá còn chịu ảnh hưởng của chính sách, cạnh tranh và các yếu tố khác. Lạm phát là sự tăng mức giá chung theo thời gian. Chi phí cơ hội là giá trị của lựa chọn tốt nhất bị bỏ qua.
+
+[TITLE] Kỹ năng học tập và ghi nhớ
+[TAGS] học tập, ghi nhớ, ôn tập ngắt quãng, tập trung
+[CONTENT]
+Ôn tập ngắt quãng và tự kiểm tra thường hữu ích hơn chỉ đọc lại thụ động. Có thể chia nội dung thành phần nhỏ, tự giải thích bằng lời của mình, làm câu hỏi luyện tập và ôn lại sau các khoảng thời gian tăng dần. Giấc ngủ và nghỉ ngắn hỗ trợ tập trung. Phương pháp hiệu quả tùy môn học và nền tảng, nên theo dõi kết quả để điều chỉnh.
+
+[TITLE] Môi trường và đa dạng sinh học
+[TAGS] môi trường, đa dạng sinh học, bảo tồn, sinh cảnh
+[CONTENT]
+Đa dạng sinh học gồm sự đa dạng gene, loài và hệ sinh thái. Nó hỗ trợ thụ phấn, hình thành đất, điều hòa nước và chu trình dinh dưỡng. Mất sinh cảnh, ô nhiễm, khai thác quá mức, loài xâm lấn và biến đổi khí hậu là các áp lực quan trọng. Bảo tồn có thể gồm bảo vệ sinh cảnh, sử dụng tài nguyên bền vững và giảm ô nhiễm.
+
+[TITLE] Tái chế và phân loại rác
+[TAGS] rác thải, tái chế, phân loại rác, nhựa, môi trường
+[CONTENT]
+Giảm phát sinh rác thường có lợi hơn chỉ tập trung vào tái chế. Có thể ưu tiên dùng lại, sửa chữa, chọn sản phẩm ít bao bì và phân loại theo hướng dẫn địa phương. Không phải mọi loại nhựa đều được tiếp nhận trong mọi hệ thống tái chế. Pin, thiết bị điện tử, hóa chất và vật sắc nhọn có thể cần điểm thu gom riêng.
+
+[TITLE] An toàn thực phẩm và bảo quản
+[TAGS] an toàn thực phẩm, bảo quản, vi khuẩn, nhiễm khuẩn
+[CONTENT]
+An toàn thực phẩm phụ thuộc vệ sinh tay, dụng cụ sạch, tách thực phẩm sống khỏi thực phẩm chín, nấu chín phù hợp và bảo quản đúng nhiệt độ. Không nên để thức ăn dễ hỏng ở nhiệt độ phòng quá lâu. Mùi và vẻ ngoài bình thường không bảo đảm thực phẩm an toàn. Khi nghi ngờ thực phẩm hỏng hoặc nhiễm bẩn, lựa chọn an toàn thường là không sử dụng.
+
+[TITLE] Sơ cứu cơ bản
+[TAGS] sơ cứu, cấp cứu, CPR, bỏng, chảy máu
+[CONTENT]
+Sơ cứu là hỗ trợ ban đầu trong khi chờ nhân viên y tế. Trước hết cần đảm bảo hiện trường an toàn và gọi cấp cứu địa phương khi tình trạng nghiêm trọng. Với chảy máu ngoài đáng kể, dùng gạc hoặc vải sạch ép trực tiếp nếu có thể. Bỏng nhiệt nên được làm mát bằng nước mát đang chảy; tránh bôi chất không rõ tác dụng và không chọc vỡ bóng nước. Người bất tỉnh hoặc không thở bình thường cần được hỗ trợ cấp cứu ngay.
+
+[TITLE] Tư duy phản biện và kiểm chứng thông tin
+[TAGS] tư duy phản biện, fact checking, bằng chứng, tin giả
+[CONTENT]
+Tư duy phản biện là đánh giá lập luận và bằng chứng trước khi kết luận. Nên kiểm tra tác giả, ngày xuất bản, nguồn dữ liệu, phương pháp và việc các nguồn độc lập có xác nhận thông tin hay không. Phân biệt ý kiến, tương quan và quan hệ nhân quả. Với chủ đề sức khỏe, khoa học hoặc an toàn, ưu tiên nguồn chuyên môn đáng tin cậy và tránh chia sẻ thông tin giật gân khi chưa xác minh.
+
+[TITLE] Giới hạn dữ liệu thời gian thực của chatbot
+[TAGS] thời gian thực, thời tiết hiện tại, tỷ số trực tiếp, dữ liệu cập nhật
+[CONTENT]
+Kho kiến thức TXT chỉ chứa thông tin được lưu trong file và không tự cập nhật theo thời gian. Chatbot không thể biết chính xác thời tiết hiện tại, cảnh báo bão mới, tỷ số đang diễn ra, giá thị trường hoặc tin tức mới nếu không kết nối nguồn dữ liệu cập nhật. Với câu hỏi về hiện tại hoặc hôm nay, hệ thống nên nêu rõ giới hạn và sử dụng API hoặc nguồn chính thức trước khi kết luận.
