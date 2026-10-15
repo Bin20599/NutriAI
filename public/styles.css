@@ -40,3 +40,109 @@ button{cursor:pointer}
 #toast{position:fixed;right:20px;bottom:20px;background:#173e59;color:#fff;border-radius:12px;padding:11px 13px;font-size:10px;display:none;box-shadow:0 14px 36px rgba(42,93,127,.24)}
 @media(max-width:960px){.sidebar{width:78px;flex-basis:78px;padding:0;}.sidebar-scroll{padding:18px 9px 10px}.sidebar-bottom{padding:8px 9px 12px}.brand div:not(.brand-mark),.new-chat span:last-child,.sidebar-search input,.sidebar-search kbd,.nav-item span:not(.nav-icon),.nav-label,.status-card,.mini-note div:not(.mini-note-icon),.history-title,.history-date{display:none}.brand{justify-content:center}.sidebar-search{justify-content:center;padding:0;width:50px;margin:15px auto}.sidebar-search>span{font-size:20px}.new-chat{justify-content:center}.nav-item{justify-content:center}.mini-note{justify-content:center}.sidebar-bottom{border-top:0}.topbar{padding:18px 20px}.chat-area,.composer-area{padding-left:20px;padding-right:20px}.suggestions{grid-template-columns:1fr}}
 @media(max-width:620px){.topbar{align-items:flex-start;gap:12px}.top-actions{flex-direction:column;align-items:flex-end}.rag-pill{font-size:9px}.welcome h2{font-size:29px}.pipeline{gap:7px}.pipe-arrow{display:none}.pipe-item{min-width:148px}.suggestions{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.knowledge-grid{grid-template-columns:1fr}.knowledge-file{align-items:flex-start;flex-wrap:wrap}.reload-btn{margin-left:50px}.composer-footer{flex-direction:column;align-items:flex-start;gap:4px}}
+
+/* =========================================
+   LOGO TRUONG HOC
+========================================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.school-logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.brand-text strong {
+  display: block;
+  font-size: 16px;
+  color: var(--navy);
+}
+
+.brand-text span {
+  display: block;
+  margin-top: 4px;
+  font-size: 8px;
+  letter-spacing: 0.8px;
+  color: #8aa2b4;
+}
+
+/* =========================================
+   KHU VUC NHOM THUC HIEN
+========================================= */
+
+.team-section {
+  margin: 22px 0 14px;
+  padding: 14px 10px;
+  background: #fafdff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.team-heading {
+  margin-bottom: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #7195ae;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.member-avatar {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #dcecf8;
+  background: #edf6fc;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.member-info strong {
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--navy);
+  overflow-wrap: anywhere;
+}
+
+.member-info span {
+  font-size: 9px;
+  line-height: 1.5;
+  color: #7890a1;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 960px) {
+  .team-section {
+    display: none;
+  }
+}
