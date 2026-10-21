@@ -12,7 +12,11 @@ except ImportError:
 
 from .rag import TextRAG
 from .tools import bmi, bmr_mifflin, tdee
-from .production_rag import ai_enabled, generate_general_answer
+from .production_rag import (
+    ai_enabled,
+    generate_general_answer,
+    generate_grounded_answer,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 RAG = TextRAG(ROOT / "data" / "knowledge.txt")
@@ -25,7 +29,9 @@ def _has(text: str, words: list[str]) -> bool:
 
 def _clean_text(text: str) -> str:
     """Chuẩn hóa khoảng trắng và dấu câu để nhận diện hội thoại."""
-    return re.sub(r"\s+", " ", text.strip().lower()).strip(" \t\n\r.,!?;:")
+    return re.sub(r"\s+", " ", text.strip().lower()).strip(
+        " \t\n\r.,!?;:"
+    )
 
 
 def _extract_metrics(
@@ -73,10 +79,7 @@ def _extract_metrics(
 
 
 def _small_talk(message: str) -> str | None:
-    """
-    Xử lý hội thoại cơ bản không cần API.
-    Chỉ xử lý những câu nhận diện rõ ràng, không thay thế RAG.
-    """
+    """Xử lý lời chào và hội thoại cơ bản."""
     text = _clean_text(message)
 
     greetings = {
@@ -108,23 +111,19 @@ def _small_talk(message: str) -> str | None:
 
     if text in greetings:
         return (
-            "Xin chào! Mình là NutriAI, trợ lý hỗ trợ về dinh dưỡng "
-            "và sức khỏe. Bạn có thể hỏi mình về giảm cân, tăng cơ, "
-            "calories, protein, thực đơn hoặc các chỉ số BMI, BMR, TDEE. "
-            "Bạn đang muốn tìm hiểu điều gì hôm nay?"
+            "Xin chào! Mình là NutriAI. Hôm nay bạn muốn "
+            "tìm hiểu về dinh dưỡng, xây dựng thực đơn hay "
+            "cải thiện một mục tiêu sức khỏe nào?"
         )
 
     if text in thanks:
         return (
-            "Rất vui được hỗ trợ bạn! Bạn cứ hỏi thêm nếu muốn tìm hiểu "
-            "sâu hơn về dinh dưỡng, thực đơn hoặc mục tiêu sức khỏe nhé."
+            "Không có gì nhé! Bạn cứ hỏi thêm nếu muốn "
+            "tìm hiểu sâu hơn."
         )
 
     if text in farewells:
-        return (
-            "Tạm biệt bạn! Chúc bạn duy trì được những thói quen "
-            "ăn uống và vận động lành mạnh. Hẹn gặp lại!"
-        )
+        return "Tạm biệt bạn! Hẹn gặp lại nhé."
 
     if text in {
         "bạn là ai",
@@ -133,10 +132,8 @@ def _small_talk(message: str) -> str | None:
         "who are you",
     }:
         return (
-            "Mình là NutriAI, trợ lý dinh dưỡng sử dụng kho kiến thức "
-            "để hỗ trợ giải đáp các câu hỏi về ăn uống, vận động và "
-            "các chỉ số sức khỏe. Mình cũng có thể tính BMI, BMR và "
-            "TDEE khi bạn cung cấp đủ thông tin."
+            "Mình là NutriAI, trợ lý hỗ trợ về dinh dưỡng, "
+            "thực đơn và các chỉ số sức khỏe như BMI, BMR, TDEE."
         )
 
     if text in {
@@ -146,10 +143,9 @@ def _small_talk(message: str) -> str | None:
         "help",
     }:
         return (
-            "Mình có thể giúp bạn tìm hiểu về giảm cân, tăng cân, "
-            "protein, calories, thực đơn và vận động; đồng thời hỗ trợ "
-            "tính BMI, BMR và TDEE. Bạn hãy nêu mục tiêu hoặc câu hỏi "
-            "cụ thể để mình hỗ trợ nhé."
+            "Mình có thể hỗ trợ bạn tìm hiểu về ăn uống, "
+            "giảm cân, tăng cơ, thực đơn và nhu cầu năng lượng. "
+            "Bạn đang muốn giải quyết vấn đề gì?"
         )
 
     return None
@@ -160,8 +156,8 @@ def _build_rag_answer(
     message: str,
 ) -> str:
     """
-    Kết hợp các đoạn kiến thức liên quan, loại bỏ nội dung trùng lặp
-    và tạo câu trả lời có cấu trúc mà không cần LLM.
+    Fallback khi AI không khả dụng.
+    Hạn chế ghép các đoạn kiến thức không liên quan.
     """
     if not contexts:
         return ""
@@ -169,7 +165,6 @@ def _build_rag_answer(
     selected = []
     seen_content = set()
 
-    # Giới hạn số đoạn để câu trả lời không quá dài.
     for item in contexts:
         content = re.sub(
             r"\s+",
@@ -196,17 +191,14 @@ def _build_rag_answer(
     if not selected:
         return ""
 
-    lead = selected[0]["content"]
-    answer_parts = [lead]
-
-    # Thêm nội dung thứ hai, thứ ba nếu đủ liên quan.
+    answer_parts = [selected[0]["content"]]
     first_score = selected[0]["score"]
 
     for item in selected[1:]:
-        score = item["score"]
-
         try:
-            relevant = score >= max(1, first_score * 0.35)
+            relevant = float(item["score"]) >= max(
+                1.0, float(first_score) * 0.6
+            )
         except (TypeError, ValueError):
             relevant = False
 
@@ -214,56 +206,10 @@ def _build_rag_answer(
             continue
 
         content = item["content"]
-
-        # Tránh lặp nguyên nội dung đã có trong câu trả lời.
-        if content.lower() not in lead.lower():
+        if content.lower() not in answer_parts[0].lower():
             answer_parts.append(content)
 
-    answer_text = "\n\n".join(answer_parts)
-
-    low = message.lower()
-
-    if _has(low, ["giảm cân", "giảm mỡ", "giảm béo"]):
-        answer_text += (
-            "\n\n**Gợi ý áp dụng:** Hãy ưu tiên thay đổi từ từ, "
-            "duy trì thói quen ăn uống phù hợp và vận động đều đặn. "
-            "Tránh các phương pháp giảm cân cực đoan."
-        )
-
-    if _has(low, ["protein", "đạm", "tăng cơ"]):
-        answer_text += (
-            "\n\n**Gợi ý thực phẩm:** Bạn có thể luân phiên trứng, "
-            "cá, thịt nạc, sữa, đậu phụ và các loại đậu tùy theo "
-            "nhu cầu và sở thích."
-        )
-
-    if _has(low, ["thực đơn", "bữa sáng", "bữa trưa", "bữa tối"]):
-        answer_text += (
-            "\n\n**Gợi ý áp dụng:** Có thể phối hợp nguồn protein, "
-            "rau củ, thực phẩm giàu tinh bột và chất béo phù hợp. "
-            "Khẩu phần nên điều chỉnh theo nhu cầu cá nhân."
-        )
-
-    if _has(low, ["calories", "calo", "kcal"]):
-        answer_text += (
-            "\n\nNhu cầu năng lượng khác nhau tùy tuổi, chiều cao, "
-            "cân nặng, mức vận động và mục tiêu của mỗi người."
-        )
-
-    if len(selected) > 1:
-        titles = []
-        for item in selected[1:]:
-            if item["title"] and item["title"] not in titles:
-                titles.append(item["title"])
-
-        if titles:
-            answer_text += (
-                "\n\n**Chủ đề kiến thức liên quan:** "
-                + "; ".join(titles)
-                + "."
-            )
-
-    return answer_text
+    return "\n\n".join(answer_parts)
 
 
 def answer(
@@ -276,18 +222,19 @@ def answer(
 
     if not m:
         return (
-            "Bạn hãy nhập câu hỏi để mình hỗ trợ nhé. "
-            "Bạn có thể hỏi về dinh dưỡng, thực đơn hoặc các chỉ số sức khỏe.",
+            "Bạn hãy nhập câu hỏi để mình hỗ trợ nhé.",
             [],
         )
 
-    # 1. Hội thoại cơ bản không cần API.
+    # 1. Hội thoại cơ bản.
     small_talk = _small_talk(m)
     if small_talk:
         return small_talk, []
 
-    # 2. Các phép tính cần kết quả xác định.
-    extracted_height, extracted_weight, extracted_age = _extract_metrics(low)
+    # 2. Tính toán BMI, BMR và TDEE.
+    extracted_height, extracted_weight, extracted_age = (
+        _extract_metrics(low)
+    )
 
     nums = [
         float(x.replace(",", "."))
@@ -295,7 +242,10 @@ def answer(
     ]
 
     if _has(low, ["bmi", "chỉ số bmi"]) and (
-        (extracted_height is not None and extracted_weight is not None)
+        (
+            extracted_height is not None
+            and extracted_weight is not None
+        )
         or len(nums) >= 2
     ):
         height = (
@@ -315,8 +265,7 @@ def answer(
                 f"BMI ước tính của bạn là {value}. "
                 f"Chỉ số này đang ở mức {label}. "
                 "BMI chỉ là chỉ số sàng lọc, không phải kết luận "
-                "toàn diện về sức khỏe. Nếu muốn, bạn có thể tìm hiểu "
-                "thêm về BMR và TDEE để tham khảo nhu cầu năng lượng.",
+                "toàn diện về sức khỏe.",
                 RAG.retrieve("BMI", 2),
             )
         except (ValueError, ZeroDivisionError):
@@ -362,44 +311,70 @@ def answer(
                 f"Theo dữ liệu bạn cung cấp, BMR ước tính khoảng "
                 f"{bmr_val:,.0f} kcal/ngày và TDEE khoảng "
                 f"{tdee_val:,.0f} kcal/ngày.\n\n"
-                "BMR là năng lượng cơ thể tiêu hao khi nghỉ ngơi; "
-                "TDEE là tổng năng lượng tiêu hao ước tính trong ngày. "
-                "Kết quả chỉ mang tính tham khảo và phụ thuộc vào "
-                "độ chính xác của thông tin đầu vào.",
+                "Đây là các giá trị ước tính, phụ thuộc vào "
+                "thông tin đầu vào và mức vận động.",
                 RAG.retrieve("BMR và TDEE", 2),
             )
         except (ValueError, ZeroDivisionError):
             return (
                 "Mình chưa thể tính BMR/TDEE từ số liệu này. "
-                "Bạn hãy kiểm tra lại tuổi, chiều cao, cân nặng "
-                "và thông tin hồ sơ nếu có nhé.",
+                "Bạn hãy kiểm tra lại tuổi, chiều cao và cân nặng nhé.",
                 [],
             )
 
-    # 3. Tìm kiếm và tổng hợp kiến thức từ TXT RAG.
+    # 3. Truy xuất kiến thức.
     contexts = RAG.retrieve(m, top_k=5)
 
+    # 4. Ưu tiên Gemini nếu đã cấu hình.
+    if ai_enabled():
+        try:
+            relevant_contexts = []
+
+            for item in contexts:
+                try:
+                    score = float(item.get("score", 0) or 0)
+                except (TypeError, ValueError):
+                    score = 0
+
+                # Ngưỡng ban đầu, cần điều chỉnh theo thang điểm RAG.
+                if score >= 4.0:
+                    relevant_contexts.append(item)
+
+            if relevant_contexts:
+                grounded_text = generate_grounded_answer(
+                    question=m,
+                    contexts=relevant_contexts[:3],
+                    profile=profile,
+                )
+
+                if grounded_text:
+                    return grounded_text, relevant_contexts
+
+            # Câu hỏi ngoài kho kiến thức hoặc không đủ ngữ cảnh.
+            general_text = generate_general_answer(
+                question=m,
+                profile=profile,
+            )
+
+            if general_text:
+                return general_text, []
+
+        except Exception as exc:
+            print(
+                "NutriAI AI generation error:",
+                str(exc)[:500],
+            )
+
+    # 5. Fallback TXT khi AI không khả dụng.
     if contexts:
         rag_answer = _build_rag_answer(contexts, m)
         if rag_answer:
             return rag_answer, contexts
 
-    # 4. Chỉ dùng mô hình mở rộng nếu đã được cấu hình.
-    if ai_enabled():
-        try:
-            general_text = generate_general_answer(m, profile)
-            if general_text:
-                return general_text, []
-        except Exception as exc:
-            print("General LLM fallback:", str(exc)[:250])
-
-    # 5. Fallback trung thực khi chưa có kiến thức phù hợp.
     return (
-        "Mình chưa tìm thấy thông tin đủ phù hợp trong kho kiến thức "
-        "để trả lời chính xác câu hỏi này.\n\n"
-        "Bạn có thể diễn đạt câu hỏi cụ thể hơn, chẳng hạn nêu mục tiêu "
-        "giảm cân, tăng cơ, loại thực phẩm hoặc chỉ số sức khỏe muốn "
-        "tìm hiểu. Mình sẽ thử tìm lại trong kho kiến thức hiện có.",
+        "Mình chưa tìm thấy thông tin đủ phù hợp để trả lời "
+        "chắc chắn. Bạn có thể nói rõ hơn một chút để mình "
+        "hỗ trợ bạn tốt hơn nhé.",
         [],
     )
 
