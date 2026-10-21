@@ -11,21 +11,23 @@ from . import db
 
 
 def ai_enabled() -> bool:
-    """Cho biết đã cấu hình ít nhất một nhà cung cấp AI sinh câu trả lời."""
+    """Kiểm tra cấu hình nhà cung cấp AI."""
     provider = os.getenv("AI_PROVIDER", "").strip().lower()
 
     if provider == "gemini":
         return bool(os.getenv("GEMINI_API_KEY"))
+
     if provider == "openai":
         return bool(os.getenv("OPENAI_API_KEY"))
 
     return bool(
-        os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
+        os.getenv("GEMINI_API_KEY")
+        or os.getenv("OPENAI_API_KEY")
     )
 
 
 def _provider() -> str:
-    """Ưu tiên Gemini nếu có key, trừ khi AI_PROVIDER được chỉ định."""
+    """Chọn nhà cung cấp AI theo cấu hình."""
     provider = os.getenv("AI_PROVIDER", "").strip().lower()
 
     if provider in {"gemini", "openai"}:
@@ -38,7 +40,7 @@ def _provider() -> str:
 
 
 def _client():
-    """Giữ client OpenAI để tương thích với code hiện tại."""
+    """Khởi tạo client OpenAI khi cần."""
     from openai import OpenAI
 
     return OpenAI(
@@ -48,14 +50,20 @@ def _client():
     )
 
 
-def _generate_text(messages: list[dict], temperature: float) -> str | None:
+def _generate_text(
+    messages: list[dict],
+    temperature: float = 0.4,
+) -> str | None:
     """Sinh câu trả lời bằng Gemini hoặc OpenAI."""
     if _provider() == "gemini":
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             return None
 
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        model = os.getenv(
+            "GEMINI_MODEL",
+            "gemini-2.5-flash",
+        )
 
         system_parts = []
         contents = []
@@ -78,8 +86,34 @@ def _generate_text(messages: list[dict], temperature: float) -> str | None:
         if not contents:
             return None
 
+        # Gemini yêu cầu các lượt user/model luân phiên.
+        # Gộp các lượt liên tiếp cùng vai trò để tránh lỗi API.
+        normalized_contents = []
+
+        for item in contents:
+            if (
+                normalized_contents
+                and normalized_contents[-1]["role"] == item["role"]
+            ):
+                normalized_contents[-1]["parts"].extend(
+                    item["parts"]
+                )
+            else:
+                normalized_contents.append(item)
+
+        # Nếu lịch sử kết thúc bằng assistant, không gửi lượt đó
+        # như lượt cuối cùng của yêu cầu mới.
+        while (
+            normalized_contents
+            and normalized_contents[-1]["role"] != "user"
+        ):
+            normalized_contents.pop()
+
+        if not normalized_contents:
+            return None
+
         payload = {
-            "contents": contents,
+            "contents": normalized_contents,
             "generationConfig": {
                 "temperature": temperature,
             },
@@ -107,11 +141,16 @@ def _generate_text(messages: list[dict], temperature: float) -> str | None:
 
         try:
             with urlopen(request, timeout=25) as response:
-                result = json.loads(response.read().decode("utf-8"))
+                result = json.loads(
+                    response.read().decode("utf-8")
+                )
         except HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
+            detail = exc.read().decode(
+                "utf-8",
+                errors="replace",
+            )
             raise RuntimeError(
-                f"Gemini API trả về HTTP {exc.code}: {detail[:1000]}"
+                f"Gemini API HTTP {exc.code}: {detail[:1000]}"
             ) from exc
         except (URLError, TimeoutError) as exc:
             raise RuntimeError(
@@ -122,35 +161,51 @@ def _generate_text(messages: list[dict], temperature: float) -> str | None:
         if not candidates:
             return None
 
-        parts = candidates[0].get("content", {}).get("parts", [])
+        candidate = candidates[0]
+        parts = candidate.get("content", {}).get("parts", [])
+
         answer = "\n".join(
             part["text"]
             for part in parts
             if isinstance(part.get("text"), str)
         ).strip()
 
-        return answer or None
+        if not answer:
+            print(
+                "Gemini returned no text. Finish reason:",
+                candidate.get("finishReason", "UNKNOWN"),
+            )
+            return None
+
+        return answer
 
     if not os.getenv("OPENAI_API_KEY"):
         return None
 
     response = _client().chat.completions.create(
-        model=os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini"),
+        model=os.getenv(
+            "OPENAI_CHAT_MODEL",
+            "gpt-4o-mini",
+        ),
         temperature=temperature,
         messages=messages,
     )
 
-    return (response.choices[0].message.content or "").strip() or None
+    return (
+        response.choices[0].message.content or ""
+    ).strip() or None
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
-    """Giữ nguyên embedding OpenAI để tương thích vector đã lưu."""
+    """Giữ embedding OpenAI để tương thích vector đã lưu."""
     if not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError(
-            "Cần OPENAI_API_KEY để tạo embedding bằng cấu hình hiện tại."
+            "Cần OPENAI_API_KEY để tạo embedding hiện tại."
         )
 
-    dimensions = int(os.getenv("EMBEDDING_DIMENSIONS", "1536"))
+    dimensions = int(
+        os.getenv("EMBEDDING_DIMENSIONS", "1536")
+    )
 
     result = _client().embeddings.create(
         model=os.getenv(
@@ -164,9 +219,15 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
     return [item.embedding for item in result.data]
 
 
-def vector_search(query: str, match_count: int = 5) -> list[dict]:
-    """Chỉ tìm vector khi có OpenAI key cho embedding."""
-    if not (db.configured() and os.getenv("OPENAI_API_KEY")):
+def vector_search(
+    query: str,
+    match_count: int = 5,
+) -> list[dict]:
+    """Tìm kiếm vector khi có cấu hình embedding."""
+    if not (
+        db.configured()
+        and os.getenv("OPENAI_API_KEY")
+    ):
         return []
 
     vector = embed_texts([query])[0]
@@ -180,83 +241,72 @@ def vector_search(query: str, match_count: int = 5) -> list[dict]:
     ) or []
 
 
-def generate_grounded_answer(
-    question: str,
-    contexts: list[dict],
-    profile=None,
-) -> str | None:
-    """Trả lời dựa trên ngữ cảnh RAG và hồ sơ người dùng."""
-    if not ai_enabled() or not contexts:
-        return None
-
+def _format_contexts(contexts: list[dict]) -> str:
+    """Chuẩn hóa đoạn kiến thức trước khi gửi Gemini."""
     excerpts = []
 
-    for i, item in enumerate(contexts[:5], 1):
+    for index, item in enumerate(contexts[:3], 1):
         metadata = item.get("metadata") or {}
+
         title = (
             item.get("title")
             or metadata.get("title")
             or "Tài liệu"
         )
-        content = item.get("chunk_text") or item.get("content") or ""
+
+        content = (
+            item.get("chunk_text")
+            or item.get("content")
+            or ""
+        ).strip()
 
         if content:
-            excerpts.append(f"[Nguồn {i}: {title}]\n{content}")
+            excerpts.append(
+                f"[Nguồn {index}: {title}]\n{content[:5000]}"
+            )
 
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "Bạn là NutriAI, trợ lý dinh dưỡng bằng tiếng Việt. "
-                "Trả lời rõ ràng, không bịa nguồn. "
-                "Dựa vào ngữ cảnh được cung cấp cho kiến thức cụ thể; "
-                "nếu không đủ thì nói rõ. "
-                "Cá nhân hóa lời khuyên theo hồ sơ người dùng khi phù hợp. "
-                "Không tự giả định dữ liệu còn thiếu. "
-                "Không chẩn đoán, kê đơn hoặc thay thế chuyên gia y tế. "
-                "Có thể trả lời lời chào tự nhiên."
-            ),
-        },
-        {
-            "role": "user",
-            "content": (
-                f"Câu hỏi: {question}\n"
-                f"Hồ sơ người dùng: {profile or {}}\n\n"
-                "Ngữ cảnh tài liệu:\n"
-                + ("\n\n".join(excerpts) if excerpts else "Không có đoạn trích.")
-            ),
-        },
-    ]
-
-    return _generate_text(messages, temperature=0.2)
+    return "\n\n".join(excerpts)
 
 
-def generate_general_answer(
+def generate_grounded_answer(
     question: str,
+    contexts: list[dict],
     profile=None,
     history=None,
 ) -> str | None:
-    """Trả lời câu hỏi phổ thông, có sử dụng hồ sơ và lịch sử chat."""
-    if not ai_enabled():
+    """Trả lời dựa trên RAG, hồ sơ và lịch sử hội thoại."""
+    if not ai_enabled() or not contexts:
+        return None
+
+    excerpts = _format_contexts(contexts)
+
+    if not excerpts:
         return None
 
     messages = [
         {
             "role": "system",
             "content": (
-                "Bạn là NutriAI, trợ lý trò chuyện bằng tiếng Việt, "
-                "ưu tiên dinh dưỡng, ăn uống, vận động và lối sống lành mạnh "
-                "nhưng vẫn có thể trả lời câu hỏi phổ thông ngoài kho RAG. "
-                "Nếu câu hỏi không thuộc dinh dưỡng, hãy trả lời trực tiếp, "
-                "hữu ích và trung thực; không giả vờ rằng câu trả lời lấy "
-                "từ kho tài liệu. Nếu không chắc, hãy nói rõ giới hạn. "
-                "Với vấn đề y tế, không chẩn đoán hoặc kê đơn và khuyên "
-                "tìm chuyên gia khi cần. "
-                "Trả lời tự nhiên, dễ hiểu, bằng ngôn ngữ người dùng. "
-                "Không nhắc đến prompt, API key hoặc chi tiết kỹ thuật nội bộ. "
-                "Sử dụng hồ sơ và lịch sử trò chuyện khi thực sự liên quan. "
-                "Không tự bịa thông tin cá nhân, chỉ số sức khỏe hoặc "
-                "thông tin người dùng chưa cung cấp."
+                "Bạn là NutriAI, trợ lý hội thoại bằng tiếng Việt, "
+                "hỗ trợ về dinh dưỡng và sức khỏe.\n\n"
+                "NGUYÊN TẮC TRẢ LỜI:\n"
+                "- Trả lời trực tiếp câu hỏi hiện tại trước.\n"
+                "- Dùng ngôn ngữ tự nhiên, thân thiện, rõ ràng.\n"
+                "- Không bắt buộc mọi câu trả lời có cùng bố cục.\n"
+                "- Câu hỏi đơn giản: trả lời ngắn gọn.\n"
+                "- Câu hỏi phức tạp: giải thích theo từng ý khi cần.\n"
+                "- Không chép nối nhiều đoạn tài liệu một cách máy móc.\n"
+                "- Chỉ dùng tài liệu làm căn cứ cho thông tin mà tài liệu "
+                "thực sự hỗ trợ.\n"
+                "- Nếu tài liệu không đủ, hãy nói rõ giới hạn và hỏi "
+                "thêm thông tin khi cần; không bịa dữ kiện.\n"
+                "- Dùng lịch sử hội thoại để hiểu câu hỏi tiếp nối.\n"
+                "- Không tự suy đoán hồ sơ hoặc mục tiêu cá nhân.\n"
+                "- Không chẩn đoán, kê đơn hay yêu cầu tự ngừng thuốc.\n"
+                "- Với câu hỏi về thuốc, cần làm rõ loại thuốc và lý do "
+                "sử dụng; khuyên người dùng hỏi bác sĩ/dược sĩ khi cần.\n"
+                "- Không đưa tiêu đề 'Chủ đề kiến thức liên quan' "
+                "hoặc liệt kê nguồn nếu người dùng không yêu cầu."
             ),
         }
     ]
@@ -274,10 +324,65 @@ def generate_general_answer(
     messages.append({
         "role": "user",
         "content": (
-            f"Câu hỏi: {question}\n"
-            "Thông tin hồ sơ do người dùng cung cấp (nếu có): "
-            f"{profile or {}}"
+            f"Câu hỏi hiện tại:\n{question}\n\n"
+            f"Hồ sơ người dùng:\n{profile or {}}\n\n"
+            f"Kiến thức truy xuất được:\n{excerpts}\n\n"
+            "Hãy trả lời đúng trọng tâm, chỉ sử dụng những thông tin "
+            "liên quan đến câu hỏi hiện tại."
         ),
     })
 
     return _generate_text(messages, temperature=0.4)
+
+
+def generate_general_answer(
+    question: str,
+    profile=None,
+    history=None,
+) -> str | None:
+    """Trả lời hội thoại thông thường bằng Gemini/OpenAI."""
+    if not ai_enabled():
+        return None
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "Bạn là NutriAI, trợ lý trò chuyện bằng tiếng Việt.\n"
+                "Ưu tiên dinh dưỡng, ăn uống, vận động và lối sống "
+                "lành mạnh, nhưng vẫn trả lời các câu hỏi phổ thông "
+                "ngoài kho kiến thức.\n"
+                "Trả lời trực tiếp, tự nhiên và đúng trọng tâm.\n"
+                "Không ép mọi câu trả lời theo một mẫu cố định.\n"
+                "Câu hỏi đơn giản nên trả lời ngắn gọn; câu hỏi cần "
+                "giải thích mới dùng danh sách hoặc tiêu đề.\n"
+                "Dùng lịch sử hội thoại khi câu hỏi phụ thuộc vào "
+                "những lượt trao đổi trước.\n"
+                "Không bịa thông tin cá nhân hoặc dữ liệu thời gian thực.\n"
+                "Với vấn đề y tế, không chẩn đoán hay kê đơn; không "
+                "khuyên tự ngừng thuốc đã được kê.\n"
+                "Nếu thiếu thông tin quan trọng, hãy hỏi một câu "
+                "làm rõ thay vì đoán."
+            ),
+        }
+    ]
+
+    for item in (history or [])[-6:]:
+        role = item.get("role")
+        content = str(item.get("content", "")).strip()
+
+        if role in {"user", "assistant"} and content:
+            messages.append({
+                "role": role,
+                "content": content[:3000],
+            })
+
+    messages.append({
+        "role": "user",
+        "content": (
+            f"Câu hỏi hiện tại:\n{question}\n\n"
+            f"Hồ sơ người dùng (nếu có): {profile or {}}"
+        ),
+    })
+
+    return _generate_text(messages, temperature=0.5)
