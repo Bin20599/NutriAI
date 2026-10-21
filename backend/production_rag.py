@@ -60,10 +60,7 @@ def _generate_text(
         if not api_key:
             return None
 
-        model = os.getenv(
-            "GEMINI_MODEL",
-            "gemini-2.5-flash",
-        )
+        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 
         system_parts = []
         contents = []
