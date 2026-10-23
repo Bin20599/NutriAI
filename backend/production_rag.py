@@ -61,7 +61,10 @@ def _generate_text(
             print("NutriAI: Chưa cấu hình GEMINI_API_KEY.")
             return None
 
-        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+
+if model.startswith("models/"):
+    model = model[len("models/"):]
 
         system_parts = []
         contents = []
