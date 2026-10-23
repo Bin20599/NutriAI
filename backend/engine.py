@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import re
@@ -133,7 +132,9 @@ def _small_talk(message: str) -> str | None:
     }:
         return (
             "Mình là NutriAI, trợ lý hỗ trợ về dinh dưỡng, "
-            "thực đơn và các chỉ số sức khỏe như BMI, BMR, TDEE."
+            "thực đơn và các chỉ số sức khỏe như BMI, BMR, TDEE. "
+            "Mình cũng có thể hỗ trợ một số câu hỏi phổ thông "
+            "thông qua AI Gemini."
         )
 
     if text in {
@@ -144,11 +145,48 @@ def _small_talk(message: str) -> str | None:
     }:
         return (
             "Mình có thể hỗ trợ bạn tìm hiểu về ăn uống, "
-            "giảm cân, tăng cơ, thực đơn và nhu cầu năng lượng. "
-            "Bạn đang muốn giải quyết vấn đề gì?"
+            "giảm cân, tăng cơ, thực đơn và nhu cầu năng lượng; "
+            "tính BMI, BMR, TDEE; đồng thời trả lời câu hỏi "
+            "phổ thông bằng AI Gemini. Với câu trả lời từ AI, "
+            "bạn nên kiểm chứng thông tin quan trọng."
         )
 
     return None
+
+
+def _get_score(item: dict) -> float:
+    """Đọc điểm truy xuất an toàn."""
+    try:
+        return float(item.get("score", 0) or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _get_title(item: dict) -> str:
+    """Lấy tiêu đề tài liệu để hiển thị nguồn."""
+    title = str(item.get("title", "") or "").strip()
+    if not title:
+        metadata = item.get("metadata")
+        if isinstance(metadata, dict):
+            title = str(metadata.get("title", "") or "").strip()
+    return title
+
+
+def _format_source_titles(contexts: list[dict]) -> str:
+    """Tạo nhãn nguồn từ các tài liệu RAG đã truy xuất."""
+    titles = []
+    seen = set()
+
+    for item in contexts:
+        title = _get_title(item)
+        if title and title.lower() not in seen:
+            seen.add(title.lower())
+            titles.append(title)
+
+    if titles:
+        return "Nguồn kiến thức NutriAI: " + "; ".join(titles[:3])
+
+    return "Nguồn kiến thức NutriAI: các đoạn tài liệu được truy xuất"
 
 
 def _build_rag_answer(
@@ -156,20 +194,28 @@ def _build_rag_answer(
     message: str,
 ) -> str:
     """
-    Fallback khi AI không khả dụng.
-    Hạn chế ghép các đoạn kiến thức không liên quan.
+    Fallback TXT khi Gemini không khả dụng.
+    Chỉ dùng các đoạn có điểm truy xuất đạt ngưỡng.
     """
     if not contexts:
+        return ""
+
+    relevant_contexts = [
+        item for item in contexts
+        if _get_score(item) >= 4.0
+    ]
+
+    if not relevant_contexts:
         return ""
 
     selected = []
     seen_content = set()
 
-    for item in contexts:
+    for item in relevant_contexts:
         content = re.sub(
             r"\s+",
             " ",
-            str(item.get("content", "")).strip(),
+            str(item.get("content", "") or "").strip(),
         )
         if not content:
             continue
@@ -180,9 +226,8 @@ def _build_rag_answer(
 
         seen_content.add(normalized)
         selected.append({
-            "title": str(item.get("title", "")).strip(),
+            "title": _get_title(item),
             "content": content,
-            "score": item.get("score", 0),
         })
 
         if len(selected) >= 3:
@@ -192,24 +237,29 @@ def _build_rag_answer(
         return ""
 
     answer_parts = [selected[0]["content"]]
-    first_score = selected[0]["score"]
 
     for item in selected[1:]:
-        try:
-            relevant = float(item["score"]) >= max(
-                1.0, float(first_score) * 0.6
-            )
-        except (TypeError, ValueError):
-            relevant = False
-
-        if not relevant:
-            continue
-
         content = item["content"]
         if content.lower() not in answer_parts[0].lower():
             answer_parts.append(content)
 
-    return "\n\n".join(answer_parts)
+    return (
+        "\n\n".join(answer_parts)
+        + "\n\n"
+        + _format_source_titles(relevant_contexts)
+        + "\nLưu ý: Đây là nội dung trích xuất trực tiếp từ tài liệu; "
+          "Gemini chưa tạo hoặc kiểm chứng câu trả lời này."
+    )
+
+
+def _ai_error_message() -> str:
+    return (
+        "Hiện tại NutriAI chưa nhận được câu trả lời từ Gemini. "
+        "Dịch vụ AI có thể đang quá tải hoặc phản hồi quá chậm. "
+        "Bạn hãy thử lại sau ít phút nhé.\n\n"
+        "Nguồn: Chưa tạo được câu trả lời từ AI Gemini; "
+        "nội dung chưa được đối chiếu đầy đủ với kho kiến thức."
+    )
 
 
 def answer(
@@ -265,7 +315,9 @@ def answer(
                 f"BMI ước tính của bạn là {value}. "
                 f"Chỉ số này đang ở mức {label}. "
                 "BMI chỉ là chỉ số sàng lọc, không phải kết luận "
-                "toàn diện về sức khỏe.",
+                "toàn diện về sức khỏe.\n\n"
+                "Nguồn: Kết quả tính toán bằng công thức BMI "
+                "trong NutriAI.",
                 RAG.retrieve("BMI", 2),
             )
         except (ValueError, ZeroDivisionError):
@@ -312,7 +364,9 @@ def answer(
                 f"{bmr_val:,.0f} kcal/ngày và TDEE khoảng "
                 f"{tdee_val:,.0f} kcal/ngày.\n\n"
                 "Đây là các giá trị ước tính, phụ thuộc vào "
-                "thông tin đầu vào và mức vận động.",
+                "thông tin đầu vào và mức vận động.\n\n"
+                "Nguồn: Kết quả tính toán bằng các công thức "
+                "BMR/TDEE trong NutriAI.",
                 RAG.retrieve("BMR và TDEE", 2),
             )
         except (ValueError, ZeroDivisionError):
@@ -322,59 +376,83 @@ def answer(
                 [],
             )
 
-    # 3. Truy xuất kiến thức.
+    # 3. Truy xuất tài liệu từ kho RAG.
     contexts = RAG.retrieve(m, top_k=5)
 
-    # 4. Ưu tiên Gemini nếu đã cấu hình.
+    relevant_contexts = [
+        item for item in contexts
+        if _get_score(item) >= 4.0
+    ]
+
+    # 4. Ưu tiên câu trả lời dựa trên RAG nếu có nguồn phù hợp.
     if ai_enabled():
-        try:
-            relevant_contexts = []
-
-            for item in contexts:
-                try:
-                    score = float(item.get("score", 0) or 0)
-                except (TypeError, ValueError):
-                    score = 0
-
-                # Ngưỡng ban đầu, cần điều chỉnh theo thang điểm RAG.
-                if score >= 4.0:
-                    relevant_contexts.append(item)
-
-            if relevant_contexts:
+        if relevant_contexts:
+            try:
                 grounded_text = generate_grounded_answer(
                     question=m,
                     contexts=relevant_contexts[:3],
                     profile=profile,
                 )
 
-                if grounded_text:
-                    return grounded_text, relevant_contexts
+                if grounded_text and grounded_text.strip():
+                    answer_text = grounded_text.strip()
+                    answer_text += (
+                        "\n\n"
+                        + _format_source_titles(relevant_contexts[:3])
+                        + "\nPhân loại: Câu trả lời do Gemini tạo "
+                          "dựa trên tài liệu RAG được truy xuất."
+                    )
+                    return answer_text, relevant_contexts
 
-            # Câu hỏi ngoài kho kiến thức hoặc không đủ ngữ cảnh.
+            except Exception as exc:
+                print(
+                    "NutriAI grounded generation error:",
+                    str(exc)[:500],
+                )
+
+        # 5. Không có nguồn RAG phù hợp, hoặc tạo câu trả lời
+        # dựa trên RAG thất bại: cho phép Gemini trả lời phổ thông.
+        try:
             general_text = generate_general_answer(
                 question=m,
                 profile=profile,
             )
 
-            if general_text:
-                return general_text, []
+            if general_text and general_text.strip():
+                answer_text = general_text.strip()
+                answer_text += (
+                    "\n\n"
+                    "Nguồn: AI Gemini.\n"
+                    "Phân loại: Câu trả lời do AI tạo; "
+                    "chưa được đối chiếu với kho kiến thức "
+                    "NutriAI cho câu hỏi này."
+                )
+
+                # Trả contexts rỗng để giao diện không hiểu nhầm
+                # rằng câu trả lời phổ thông có nguồn RAG.
+                return answer_text, []
 
         except Exception as exc:
             print(
-                "NutriAI AI generation error:",
+                "NutriAI general generation error:",
                 str(exc)[:500],
             )
 
-    # 5. Fallback TXT khi AI không khả dụng.
-    if contexts:
-        rag_answer = _build_rag_answer(contexts, m)
-        if rag_answer:
-            return rag_answer, contexts
+        # Không trả về các đoạn TXT không liên quan khi Gemini lỗi.
+        return _ai_error_message(), []
+
+    # 6. Không có Gemini: chỉ trả lời bằng TXT khi có nguồn đủ phù hợp.
+    rag_answer = _build_rag_answer(contexts, m)
+    if rag_answer:
+        return rag_answer, relevant_contexts
 
     return (
-        "Mình chưa tìm thấy thông tin đủ phù hợp để trả lời "
-        "chắc chắn. Bạn có thể nói rõ hơn một chút để mình "
-        "hỗ trợ bạn tốt hơn nhé.",
+        "Mình chưa tìm thấy nguồn kiến thức đủ phù hợp trong "
+        "kho dữ liệu NutriAI để trả lời chắc chắn. Hiện tại AI "
+        "Gemini chưa được cấu hình hoặc chưa khả dụng. Bạn có thể "
+        "thử diễn đạt câu hỏi cụ thể hơn hoặc bổ sung tài liệu "
+        "liên quan vào kho kiến thức.\n\n"
+        "Nguồn: Chưa có câu trả lời được tạo bởi AI Gemini.",
         [],
     )
 
