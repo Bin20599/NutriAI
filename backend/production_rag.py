@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import time
 import json
 import os
 from urllib.error import HTTPError, URLError
@@ -49,6 +49,7 @@ def _client():
     )
 
 
+
 def _generate_text(
     messages: list[dict],
     temperature: float = 0.4,
@@ -57,6 +58,7 @@ def _generate_text(
     if _provider() == "gemini":
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
+            print("NutriAI: Chưa cấu hình GEMINI_API_KEY.")
             return None
 
         model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
@@ -82,8 +84,7 @@ def _generate_text(
         if not contents:
             return None
 
-        # Gemini yêu cầu các lượt user/model luân phiên.
-        # Gộp các lượt liên tiếp cùng vai trò để tránh lỗi API.
+        # Gộp các lượt liên tiếp có cùng vai trò.
         normalized_contents = []
 
         for item in contents:
@@ -97,8 +98,7 @@ def _generate_text(
             else:
                 normalized_contents.append(item)
 
-        # Nếu lịch sử kết thúc bằng assistant, không gửi lượt đó
-        # như lượt cuối cùng của yêu cầu mới.
+        # Đảm bảo lượt cuối cùng là câu hỏi của người dùng.
         while (
             normalized_contents
             and normalized_contents[-1]["role"] != "user"
@@ -135,26 +135,46 @@ def _generate_text(
             method="POST",
         )
 
-        try:
-            with urlopen(request, timeout=25) as response:
-                result = json.loads(
-                    response.read().decode("utf-8")
+        # Thử tối đa 2 lần nếu Gemini tạm thời quá tải.
+        result = None
+
+        for attempt in range(2):
+            try:
+                with urlopen(request, timeout=20) as response:
+                    result = json.loads(
+                        response.read().decode("utf-8")
+                    )
+                break
+
+            except HTTPError as exc:
+                detail = exc.read().decode(
+                    "utf-8",
+                    errors="replace",
                 )
-        except HTTPError as exc:
-            detail = exc.read().decode(
-                "utf-8",
-                errors="replace",
-            )
-            raise RuntimeError(
-                f"Gemini API HTTP {exc.code}: {detail[:1000]}"
-            ) from exc
-        except (URLError, TimeoutError) as exc:
-            raise RuntimeError(
-                f"Không thể kết nối Gemini API: {exc}"
-            ) from exc
+
+                if exc.code == 503 and attempt == 0:
+                    print(
+                        "NutriAI: Gemini trả về HTTP 503; "
+                        "thử lại sau 1 giây."
+                    )
+                    time.sleep(1)
+                    continue
+
+                raise RuntimeError(
+                    f"Gemini API HTTP {exc.code}: {detail[:1000]}"
+                ) from exc
+
+            except (URLError, TimeoutError) as exc:
+                raise RuntimeError(
+                    f"Không thể kết nối Gemini API: {exc}"
+                ) from exc
+
+        if result is None:
+            return None
 
         candidates = result.get("candidates") or []
         if not candidates:
+            print("NutriAI: Gemini không trả về candidates.")
             return None
 
         candidate = candidates[0]
@@ -175,6 +195,7 @@ def _generate_text(
 
         return answer
 
+    # Sử dụng OpenAI nếu provider không phải Gemini.
     if not os.getenv("OPENAI_API_KEY"):
         return None
 
@@ -190,6 +211,7 @@ def _generate_text(
     return (
         response.choices[0].message.content or ""
     ).strip() or None
+
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
