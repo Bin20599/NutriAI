@@ -48,8 +48,6 @@ def _client():
         max_retries=1,
     )
 
-
-
 def _generate_text(
     messages: list[dict],
     temperature: float = 0.4,
@@ -63,8 +61,9 @@ def _generate_text(
 
         model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
 
-if model.startswith("models/"):
-    model = model[len("models/"):]
+        # Loại bỏ tiền tố models/ nếu biến môi trường có chứa nó
+        if model.startswith("models/"):
+            model = model[len("models/"):]
 
         system_parts = []
         contents = []
@@ -83,6 +82,7 @@ if model.startswith("models/"):
                     "role": "model" if role == "assistant" else "user",
                     "parts": [{"text": content}],
                 })
+
 
         if not contents:
             return None
