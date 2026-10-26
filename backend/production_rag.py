@@ -59,7 +59,7 @@ def _generate_text(
             print("NutriAI: Chưa cấu hình GEMINI_API_KEY.")
             return None
 
-        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash-lite").strip()
 
         # Loại bỏ tiền tố models/ nếu biến môi trường có chứa nó
         if model.startswith("models/"):
@@ -143,7 +143,7 @@ def _generate_text(
 
         for attempt in range(2):
             try:
-                with urlopen(request, timeout=20) as response:
+                with urlopen(request, timeout=60) as response:
                     result = json.loads(
                         response.read().decode("utf-8")
                     )
