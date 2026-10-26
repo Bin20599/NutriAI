@@ -33,6 +33,33 @@ def _clean_text(text: str) -> str:
     )
 
 
+def _remove_unwanted_ai_metadata(text: str) -> str:
+    """Bỏ lời chào lặp và nhãn nguồn/phân loại khỏi câu trả lời AI."""
+    lines = text.strip().splitlines()
+    cleaned = []
+    for line in lines:
+        if re.match(
+            r"^\s*(?:Nguồn(?: kiến thức NutriAI)?|Phân loại)\s*:",
+            line,
+            flags=re.IGNORECASE,
+        ):
+            continue
+        cleaned.append(line)
+
+    result = "\n".join(cleaned).strip()
+    # Bỏ lời chào tự phát ở đầu câu trả lời; lời chào người dùng gửi
+    # riêng đã được xử lý bởi _small_talk().
+    result = re.sub(
+        r"^(?:Xin chào(?: bạn)?|Chào(?: bạn)?(?:\s+[^,!.\n]{1,40})?|"
+        r"Hello|Hi|Hey)(?:\s*[,!:.—-]\s*|\s+)",
+        "",
+        result,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    return result.strip()
+
+
 def _extract_metrics(
     text: str,
 ) -> tuple[float | None, float | None, int | None]:
@@ -243,22 +270,14 @@ def _build_rag_answer(
         if content.lower() not in answer_parts[0].lower():
             answer_parts.append(content)
 
-    return (
-        "\n\n".join(answer_parts)
-        + "\n\n"
-        + _format_source_titles(relevant_contexts)
-        + "\nLưu ý: Đây là nội dung trích xuất trực tiếp từ tài liệu; "
-          "Gemini chưa tạo hoặc kiểm chứng câu trả lời này."
-    )
+    return "\n\n".join(answer_parts)
 
 
 def _ai_error_message() -> str:
     return (
         "Hiện tại NutriAI chưa nhận được câu trả lời từ Gemini. "
         "Dịch vụ AI có thể đang quá tải hoặc phản hồi quá chậm. "
-        "Bạn hãy thử lại sau ít phút nhé.\n\n"
-        "Nguồn: Chưa tạo được câu trả lời từ AI Gemini; "
-        "nội dung chưa được đối chiếu đầy đủ với kho kiến thức."
+        "Bạn hãy thử lại sau ít phút nhé."
     )
 
 
@@ -315,10 +334,8 @@ def answer(
                 f"BMI ước tính của bạn là {value}. "
                 f"Chỉ số này đang ở mức {label}. "
                 "BMI chỉ là chỉ số sàng lọc, không phải kết luận "
-                "toàn diện về sức khỏe.\n\n"
-                "Nguồn: Kết quả tính toán bằng công thức BMI "
-                "trong NutriAI.",
-                RAG.retrieve("BMI", 2),
+                "toàn diện về sức khỏe.",
+                [],
             )
         except (ValueError, ZeroDivisionError):
             return (
@@ -364,10 +381,8 @@ def answer(
                 f"{bmr_val:,.0f} kcal/ngày và TDEE khoảng "
                 f"{tdee_val:,.0f} kcal/ngày.\n\n"
                 "Đây là các giá trị ước tính, phụ thuộc vào "
-                "thông tin đầu vào và mức vận động.\n\n"
-                "Nguồn: Kết quả tính toán bằng các công thức "
-                "BMR/TDEE trong NutriAI.",
-                RAG.retrieve("BMR và TDEE", 2),
+                "thông tin đầu vào và mức vận động.",
+                [],
             )
         except (ValueError, ZeroDivisionError):
             return (
@@ -395,14 +410,11 @@ def answer(
                 )
 
                 if grounded_text and grounded_text.strip():
-                    answer_text = grounded_text.strip()
-                    answer_text += (
-                        "\n\n"
-                        + _format_source_titles(relevant_contexts[:3])
-                        + "\nPhân loại: Câu trả lời do Gemini tạo "
-                          "dựa trên tài liệu RAG được truy xuất."
+                    answer_text = _remove_unwanted_ai_metadata(
+                        grounded_text.strip()
                     )
-                    return answer_text, relevant_contexts
+                    if answer_text:
+                        return answer_text, []
 
             except Exception as exc:
                 print(
@@ -419,18 +431,12 @@ def answer(
             )
 
             if general_text and general_text.strip():
-                answer_text = general_text.strip()
-                answer_text += (
-                    "\n\n"
-                    "Nguồn: AI Gemini.\n"
-                    "Phân loại: Câu trả lời do AI tạo; "
-                    "chưa được đối chiếu với kho kiến thức "
-                    "NutriAI cho câu hỏi này."
+                answer_text = _remove_unwanted_ai_metadata(
+                    general_text.strip()
                 )
-
-                # Trả contexts rỗng để giao diện không hiểu nhầm
-                # rằng câu trả lời phổ thông có nguồn RAG.
-                return answer_text, []
+                if answer_text:
+                    # Câu trả lời phổ thông không gắn nguồn RAG.
+                    return answer_text, []
 
         except Exception as exc:
             print(
@@ -444,15 +450,14 @@ def answer(
     # 6. Không có Gemini: chỉ trả lời bằng TXT khi có nguồn đủ phù hợp.
     rag_answer = _build_rag_answer(contexts, m)
     if rag_answer:
-        return rag_answer, relevant_contexts
+        return rag_answer, []
 
     return (
         "Mình chưa tìm thấy nguồn kiến thức đủ phù hợp trong "
         "kho dữ liệu NutriAI để trả lời chắc chắn. Hiện tại AI "
         "Gemini chưa được cấu hình hoặc chưa khả dụng. Bạn có thể "
         "thử diễn đạt câu hỏi cụ thể hơn hoặc bổ sung tài liệu "
-        "liên quan vào kho kiến thức.\n\n"
-        "Nguồn: Chưa có câu trả lời được tạo bởi AI Gemini.",
+        "liên quan vào kho kiến thức.",
         [],
     )
 
